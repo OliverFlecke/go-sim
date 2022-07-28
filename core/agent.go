@@ -1,5 +1,9 @@
 package simulator
 
+import (
+	direction "simulator/core/direction"
+)
+
 type Agent struct {
 	name     string
 	location Location
@@ -12,15 +16,15 @@ func NewAgent(name string) *Agent {
 	}
 }
 
-func (agent *Agent) Move(direction Direction) {
-	switch direction {
-	case NORTH:
+func (agent *Agent) Move(dir direction.Direction) {
+	switch dir {
+	case direction.NORTH:
 		agent.location.y += 1
-	case SOUTH:
+	case direction.SOUTH:
 		agent.location.y -= 1
-	case EAST:
+	case direction.EAST:
 		agent.location.x += 1
-	case WEST:
+	case direction.WEST:
 		agent.location.x -= 1
 	}
 }
