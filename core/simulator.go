@@ -19,14 +19,14 @@ type Agent struct {
 	location Location
 }
 
-func newAgent(name string) *Agent {
+func NewAgent(name string) *Agent {
 	return &Agent{
 		name:     name,
 		location: Location{},
 	}
 }
 
-func (agent Agent) move(direction Direction) {
+func (agent Agent) Move(direction Direction) {
 	switch direction {
 	case NORTH:
 		agent.location.y += 1
