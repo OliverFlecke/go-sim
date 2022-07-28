@@ -1,29 +1,5 @@
 package simulator
 
-func Run() string {
-	return "Hello from simulator"
-}
-
-func move(agent *Agent, direction Direction) {
-	switch direction {
-	case NORTH:
-		agent.location.y += 1
-	case SOUTH:
-		agent.location.y -= 1
-	case EAST:
-		agent.location.x += 1
-	case WEST:
-		agent.location.x -= 1
-	}
-}
-
-func newAgent(name string) *Agent {
-	return &Agent{
-		name:     name,
-		location: Location{},
-	}
-}
-
 type Direction byte
 
 const (
@@ -41,4 +17,24 @@ type Location struct {
 type Agent struct {
 	name     string
 	location Location
+}
+
+func newAgent(name string) *Agent {
+	return &Agent{
+		name:     name,
+		location: Location{},
+	}
+}
+
+func (agent Agent) move(direction Direction) {
+	switch direction {
+	case NORTH:
+		agent.location.y += 1
+	case SOUTH:
+		agent.location.y -= 1
+	case EAST:
+		agent.location.x += 1
+	case WEST:
+		agent.location.x -= 1
+	}
 }
