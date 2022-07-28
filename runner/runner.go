@@ -9,4 +9,6 @@ func main() {
 	fmt.Println("Running simulation")
 	agent := simulator.NewAgent("Agent A")
 	fmt.Println(agent)
+	agent.Move(simulator.NORTH)
+	fmt.Println(agent)
 }
