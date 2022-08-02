@@ -48,12 +48,34 @@ func (world *World) GetLocation(loc Location) GridType {
 }
 
 func (w *World) ToString() string {
+	return w.toStringHelper(func(l Location) rune {
+		return ToRune(w.GetLocation(l))
+	})
+}
+
+func (w *World) ToStringWithAgents(agents []Agent) string {
+	lookup := make(map[Location]Agent)
+	for _, agent := range agents {
+		lookup[agent.location] = agent
+	}
+
+	return w.toStringHelper(func(l Location) rune {
+		agent, found := lookup[l]
+		if found {
+			return rune('0' + agent.id%10)
+		} else {
+			return ToRune(w.GetLocation(l))
+		}
+	})
+}
+
+func (w *World) toStringHelper(toRune func(Location) rune) string {
 	var str strings.Builder
 	corner := w.lowerRightCorner()
 
 	for y := 0; y <= corner.y; y++ {
 		for x := 0; x <= corner.x; x++ {
-			str.WriteRune(ToRune(w.GetLocation(Location{x: x, y: y})))
+			str.WriteRune(toRune(Location{x: x, y: y}))
 		}
 		str.WriteRune('\n')
 	}

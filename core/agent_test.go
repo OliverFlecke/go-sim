@@ -28,3 +28,10 @@ func TestMove(t *testing.T) {
 		}
 	}
 }
+
+func TestNewAgent(t *testing.T) {
+	a := NewAgent("Agent A")
+	b := NewAgent("Agent B")
+	AssertEqual(t, a.id, 0)
+	AssertEqual(t, b.id, 1)
+}

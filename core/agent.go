@@ -1,12 +1,20 @@
 package simulator
 
 type Agent struct {
+	id       int
 	name     string
 	location Location
 }
 
+var amountOfAgents int = 0
+
 func NewAgent(name string) *Agent {
+	defer func() {
+		amountOfAgents++
+	}()
+
 	return &Agent{
+		id:       amountOfAgents,
 		name:     name,
 		location: Location{},
 	}
