@@ -6,15 +6,9 @@ type Agent struct {
 	location Location
 }
 
-var amountOfAgents int = 0
-
-func NewAgent(name string) *Agent {
-	defer func() {
-		amountOfAgents++
-	}()
-
+func NewAgent(name string, id int) *Agent {
 	return &Agent{
-		id:       amountOfAgents,
+		id:       id,
 		name:     name,
 		location: Location{},
 	}

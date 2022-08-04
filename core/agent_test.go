@@ -6,7 +6,7 @@ import (
 )
 
 func TestMove(t *testing.T) {
-	agent := NewAgent("test agent")
+	agent := NewAgent("test agent", 0)
 	directions := []Direction{
 		NORTH,
 		EAST,
@@ -30,8 +30,8 @@ func TestMove(t *testing.T) {
 }
 
 func TestNewAgent(t *testing.T) {
-	a := NewAgent("Agent A")
-	b := NewAgent("Agent B")
+	a := NewAgent("Agent A", 0)
+	b := NewAgent("Agent B", 1)
 	AssertEqual(t, a.id, 0)
 	AssertEqual(t, b.id, 1)
 }

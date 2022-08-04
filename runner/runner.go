@@ -11,7 +11,7 @@ import (
 func main() {
 	fmt.Println("Starting simulation...")
 	world := simulator.NewGridWorld(10)
-	agent := simulator.NewAgent("Agent A")
+	agent := simulator.NewAgent("Agent A", 0)
 	fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
 
 	keyboard.Listen(func(key keys.Key) (stop bool, err error) {

@@ -73,14 +73,24 @@ func (w *World) toStringHelper(toRune func(Location) rune) string {
 	var str strings.Builder
 	corner := w.lowerRightCorner()
 
+	writeFullLineWall(&str, corner.x+3)
+	str.WriteRune('\n')
 	for y := 0; y <= corner.y; y++ {
+		str.WriteRune('#')
 		for x := 0; x <= corner.x; x++ {
 			str.WriteRune(toRune(Location{x: x, y: y}))
 		}
-		str.WriteRune('\n')
+		str.WriteString("#\n")
 	}
+	writeFullLineWall(&str, corner.x+3)
 
-	return str.String()[:str.Len()-1]
+	return str.String()
+}
+
+func writeFullLineWall(str *strings.Builder, size int) {
+	for x := 0; x < size; x++ {
+		str.WriteRune('#')
+	}
 }
 
 func (w *World) lowerRightCorner() Location {

@@ -13,7 +13,7 @@ func TestNewGridWorld(t *testing.T) {
 
 func TestToString(t *testing.T) {
 	world := NewGridWorld(3)
-	expected := "   \n   \n   "
+	expected := "#####\n#   #\n#   #\n#   #\n#####"
 
 	actual := world.ToString()
 	if actual != expected {
@@ -24,10 +24,10 @@ func TestToString(t *testing.T) {
 func TestToStringWithAgents(t *testing.T) {
 	world := NewGridWorld(3)
 	agents := []Agent{
-		*NewAgent("Test agent"),
+		*NewAgent("Test agent", 0),
 	}
 	agents[0].location = Location{x: 1, y: 1}
-	expected := "   \n 0 \n   "
+	expected := "#####\n#   #\n# 0 #\n#   #\n#####"
 
 	actual := world.ToStringWithAgents(agents)
 
