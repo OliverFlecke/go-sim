@@ -21,8 +21,10 @@ func main() {
 
 		dir, found := keyToDirection(key)
 		if found {
-			agent.Move(dir)
 			clearScreen()
+			if !agent.MoveInWorld(world, dir) {
+				fmt.Println("Invalid move")
+			}
 			fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
 		}
 

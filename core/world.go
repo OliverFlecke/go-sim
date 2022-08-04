@@ -43,7 +43,7 @@ func (world *World) GetLocation(loc Location) GridType {
 	if found {
 		return result
 	} else {
-		return EMPTY
+		return WALL
 	}
 }
 

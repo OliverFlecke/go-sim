@@ -21,7 +21,7 @@ func TestMove(t *testing.T) {
 	}
 
 	for i, dir := range directions {
-		agent.Move(dir)
+		agent.move(dir)
 		if agent.location != locations[i] {
 			fmt.Println(`Location is`, agent.location)
 			t.Fatal(`Wrong location for agent`)
@@ -34,4 +34,13 @@ func TestNewAgent(t *testing.T) {
 	b := NewAgent("Agent B", 1)
 	AssertEqual(t, a.id, 0)
 	AssertEqual(t, b.id, 1)
+}
+
+func TestIsValidMove(t *testing.T) {
+	a := NewAgent("Test agent", 0)
+	w := NewGridWorld(3)
+
+	if a.IsValidMove(w, WEST) {
+		t.Fatal("WEST is not a valid move in this situation")
+	}
 }
