@@ -13,19 +13,26 @@ type Cell struct {
 	previous *Cell
 }
 
+type SearchStats struct {
+	visited int
+}
+
 func FindPath(
 	world *sim.World,
 	start sim.Location,
-	end sim.Location) ([]sim.Location, error) {
+	end sim.Location) ([]sim.Location, SearchStats, error) {
 
 	visited := mapset.NewSet[sim.Location]()
 	visited.Add(start)
-
 	queue := prque.New(nil)
 	queue.Push(Cell{location: start}, 0)
 
+	var result []sim.Location
+	var err error
+
 	for {
 		if queue.Empty() {
+			err = errors.New("no path found")
 			break
 		}
 
@@ -33,7 +40,8 @@ func FindPath(
 		cell := current.(Cell)
 
 		if cell.location == end {
-			return cell.getDataList(), nil
+			result = cell.getDataList()
+			break
 		}
 
 		for _, neighbor := range neighbors(world, cell.location) {
@@ -48,7 +56,10 @@ func FindPath(
 		}
 	}
 
-	return nil, errors.New("no path found")
+	return result,
+		SearchStats{
+			visited: visited.Cardinality(),
+		}, err
 }
 
 func neighbors(world *sim.World, location sim.Location) []sim.Location {

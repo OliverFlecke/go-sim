@@ -24,3 +24,7 @@ func (loc Location) MoveInDirection(dir Direction) Location {
 
 	return result
 }
+
+func (loc Location) ManhattanDistance(other Location) int {
+	return Abs(loc.x-other.x) + Abs(loc.y-other.y)
+}
