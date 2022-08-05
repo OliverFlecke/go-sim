@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	simulator "simulator/core"
+	maps "simulator/core/map"
 	pathfinding "simulator/path_finding"
 
 	"atomicgo.dev/keyboard"
@@ -11,8 +13,13 @@ import (
 
 func main() {
 	fmt.Println("Starting simulation...")
-	world := simulator.NewGridWorld(10)
-	agent := simulator.NewAgent("Agent A", 0)
+	mapName := "maps/01.map"
+	world, err := maps.GetStringFromFile(mapName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	agent := simulator.NewAgentWithStartLocation("Agent 0", '0', simulator.NewLocation(1, 1))
 	fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
 	fmt.Println()
 

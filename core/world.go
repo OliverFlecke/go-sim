@@ -24,19 +24,40 @@ type World struct {
 	grid map[Location]GridType
 }
 
+func NewWorld(grid map[Location]GridType) *World {
+	return &World{
+		grid: grid,
+	}
+}
+
 func NewGridWorld(size int) *World {
 	grid := make(map[Location]GridType)
 
-	for x := 0; x < size; x++ {
-		for y := 0; y < size; y++ {
+	for y := 0; y <= size+1; y++ {
+		grid[NewLocation(0, y)] = WALL
+		grid[NewLocation(size+1, y)] = WALL
+
+	}
+
+	for x := 1; x <= size; x++ {
+		grid[NewLocation(x, 0)] = WALL
+		for y := 1; y <= size; y++ {
 			grid[Location{x: x, y: y}] = EMPTY
 		}
+		grid[NewLocation(x, size+1)] = WALL
 	}
 
 	return &World{
 		grid: grid,
 	}
 }
+
+// Getter and Setters
+func (w *World) GetMap() map[Location]GridType {
+	return w.grid
+}
+
+// Methods
 
 func (world *World) GetLocation(loc Location) GridType {
 	result, found := world.grid[loc]
@@ -62,7 +83,7 @@ func (w *World) ToStringWithAgents(agents []Agent) string {
 	return w.toStringHelper(func(l Location) rune {
 		agent, found := lookup[l]
 		if found {
-			return rune('0' + agent.id%10)
+			return agent.callsign
 		} else {
 			return ToRune(w.GetLocation(l))
 		}
@@ -89,24 +110,14 @@ func (w *World) toStringHelper(toRune func(Location) rune) string {
 	var str strings.Builder
 	corner := w.lowerRightCorner()
 
-	writeFullLineWall(&str, corner.x+3)
-	str.WriteRune('\n')
 	for y := 0; y <= corner.y; y++ {
-		str.WriteRune('#')
 		for x := 0; x <= corner.x; x++ {
 			str.WriteRune(toRune(Location{x: x, y: y}))
 		}
-		str.WriteString("#\n")
+		str.WriteString("\n")
 	}
-	writeFullLineWall(&str, corner.x+3)
 
-	return str.String()
-}
-
-func writeFullLineWall(str *strings.Builder, size int) {
-	for x := 0; x < size; x++ {
-		str.WriteRune('#')
-	}
+	return str.String()[:str.Len()-1]
 }
 
 func (w *World) lowerRightCorner() Location {

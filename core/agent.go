@@ -1,16 +1,24 @@
 package simulator
 
 type Agent struct {
-	id       int
+	callsign rune
 	name     string
 	location Location
 }
 
-func NewAgent(name string, id int) *Agent {
+func NewAgent(name string, callsign rune) *Agent {
 	return &Agent{
-		id:       id,
+		callsign: callsign,
 		name:     name,
 		location: Location{},
+	}
+}
+
+func NewAgentWithStartLocation(name string, callsign rune, start Location) *Agent {
+	return &Agent{
+		callsign: callsign,
+		name:     name,
+		location: start,
 	}
 }
 
