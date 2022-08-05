@@ -1,13 +1,17 @@
 package pathfinding
 
 import (
-	"container/heap"
 	"errors"
-	"fmt"
 	sim "simulator/core"
 
 	mapset "github.com/deckarep/golang-set/v2"
+	prque "github.com/ethereum/go-ethereum/common/prque"
 )
+
+type Cell struct {
+	location sim.Location
+	previous *Cell
+}
 
 func FindPath(
 	world *sim.World,
@@ -17,35 +21,29 @@ func FindPath(
 	visited := mapset.NewSet[sim.Location]()
 	visited.Add(start)
 
-	frontier := make(PriorityQueue, 0)
-	heap.Push(&frontier, &Item[sim.Location]{
-		data: start,
-		cost: 0,
-	})
+	queue := prque.New(nil)
+	queue.Push(Cell{location: start}, 0)
 
 	for {
-		if frontier.Len() == 0 {
+		if queue.Empty() {
 			break
 		}
 
-		current := frontier.Pop().(*Item[sim.Location])
+		current, cost := queue.Pop()
+		cell := current.(Cell)
 
-		fmt.Printf("Exploring %v. Cost: %d\n",
-			current.data, current.cost)
-
-		if current.data == end {
-			return current.GetDataList(), nil
+		if cell.location == end {
+			return cell.getDataList(), nil
 		}
 
-		for _, neighbor := range neighbors(world, current.data) {
+		for _, neighbor := range neighbors(world, cell.location) {
 			if !visited.Contains(neighbor) {
 				visited.Add(neighbor)
-				heap.Push(&frontier, &Item[sim.Location]{
-					previous: current,
-					data:     neighbor,
-					cost:     -(current.depth + 1),
-					depth:    current.depth + 1,
-				})
+				queue.Push(Cell{
+					location: neighbor,
+					previous: &cell,
+				},
+					cost-1)
 			}
 		}
 	}
@@ -70,4 +68,19 @@ func neighbors(world *sim.World, location sim.Location) []sim.Location {
 	}
 
 	return neighbors
+}
+
+func (item *Cell) getDataList() []sim.Location {
+	result := make([]sim.Location, 0)
+
+	for item != nil {
+		result = append(result, item.location)
+		item = item.previous
+	}
+
+	for i, j := 0, len(result)-1; i < j; i, j = i+1, j-1 {
+		result[i], result[j] = result[j], result[i]
+	}
+
+	return result
 }
