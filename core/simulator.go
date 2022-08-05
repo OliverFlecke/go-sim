@@ -42,15 +42,20 @@ func (s *Simulation) Run(quit chan bool) <-chan time.Time {
 			case t := <-ticker.C:
 				// fmt.Printf("Tick %v\n", t)
 
+				finished := true
 				for agent, actions := range s.actions {
 					if len(actions) > 0 {
 						dir := actions[0]
 						agent.MoveInWorld(s.world, dir)
 						s.actions[agent] = actions[1:]
+						finished = finished && len(s.actions[agent]) == 0
 					}
 				}
 
 				output <- t
+				if finished {
+					return
+				}
 			}
 		}
 	}()

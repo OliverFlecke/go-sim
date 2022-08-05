@@ -43,20 +43,11 @@ func main() {
 		quit := make(chan bool)
 		ticker := sim.Run(quit)
 
-		go func() {
-			for t := range ticker {
-				fmt.Printf("World at %s\n", t)
-				fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
-			}
-			fmt.Print("Completed")
-		}()
-
-		var command string
-		_, err = fmt.Scan(&command)
-		if err != nil {
-			fmt.Print(err)
+		for t := range ticker {
+			fmt.Printf("\n\nWorld at %s\n", t)
+			fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
 		}
-		quit <- true
+		fmt.Print("\nCompleted\n")
 	}
 }
 
