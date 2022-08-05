@@ -69,6 +69,22 @@ func (w *World) ToStringWithAgents(agents []Agent) string {
 	})
 }
 
+func (w *World) ToStringWithPath(path []Location) string {
+	lookup := make(map[Location]rune)
+	for _, location := range path {
+		lookup[location] = 'x'
+	}
+
+	return w.toStringHelper(func(l Location) rune {
+		r, found := lookup[l]
+		if found {
+			return r
+		} else {
+			return ToRune(w.GetLocation(l))
+		}
+	})
+}
+
 func (w *World) toStringHelper(toRune func(Location) rune) string {
 	var str strings.Builder
 	corner := w.lowerRightCorner()

@@ -5,6 +5,10 @@ type Location struct {
 	y int
 }
 
+func NewLocation(x int, y int) Location {
+	return Location{x: x, y: y}
+}
+
 func (loc Location) MoveInDirection(dir Direction) Location {
 	result := loc
 	switch dir {
