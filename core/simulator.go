@@ -12,11 +12,6 @@ type Simulation struct {
 	actions map[*Agent][]Direction // TODO: Maybe introduce an action interface for this
 }
 
-type SimulationOptions struct {
-	waitForAction bool
-	tickDuration  time.Duration
-}
-
 func NewSimulation(world *World, agents []Agent, options SimulationOptions) *Simulation {
 	return &Simulation{
 		world:   world,
@@ -27,8 +22,13 @@ func NewSimulation(world *World, agents []Agent, options SimulationOptions) *Sim
 }
 
 func (s *Simulation) Run(quit chan bool) <-chan time.Time {
-	ticker := time.NewTicker(1 * time.Second)
 	output := make(chan time.Time)
+	if s.options.tickDuration == 0 {
+		defer close(output)
+		return output
+	}
+
+	ticker := time.NewTicker(s.options.tickDuration)
 
 	go func() {
 		defer ticker.Stop()

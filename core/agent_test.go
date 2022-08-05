@@ -30,10 +30,10 @@ func TestMove(t *testing.T) {
 }
 
 func TestNewAgent(t *testing.T) {
-	a := NewAgent("Agent A", 0)
-	b := NewAgent("Agent B", 1)
-	AssertEqual(t, a.id, 0)
-	AssertEqual(t, b.id, 1)
+	a := NewAgent("Agent A", 'A')
+	b := NewAgent("Agent B", 'B')
+	AssertEqual(t, a.callsign, 'A')
+	AssertEqual(t, b.callsign, 'B')
 }
 
 func TestIsValidMove(t *testing.T) {

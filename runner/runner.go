@@ -6,6 +6,7 @@ import (
 	simulator "simulator/core"
 	maps "simulator/core/map"
 	pathfinding "simulator/path_finding"
+	"time"
 
 	"atomicgo.dev/keyboard"
 	"atomicgo.dev/keyboard/keys"
@@ -23,10 +24,9 @@ func main() {
 	fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
 	fmt.Println()
 
-	sim := simulator.NewSimulation(
-		world,
-		[]simulator.Agent{*agent},
-		simulator.SimulationOptions{})
+	opt := simulator.SimulationOptions{}
+	opt.SetTickDuration(300 * time.Millisecond)
+	sim := simulator.NewSimulation(world, []simulator.Agent{*agent}, opt)
 
 	for {
 		fmt.Print("Enter goal: ")

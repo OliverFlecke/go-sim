@@ -4,7 +4,7 @@ import "testing"
 
 func TestNewGridWorld(t *testing.T) {
 	world := NewGridWorld(10)
-	expectedSize := 100
+	expectedSize := 144
 
 	if len(world.grid) != expectedSize {
 		t.Fatalf(`World does not have the right size. Expected %d but got %d`, expectedSize, len(world.grid))
@@ -24,9 +24,8 @@ func TestToString(t *testing.T) {
 func TestToStringWithAgents(t *testing.T) {
 	world := NewGridWorld(3)
 	agents := []Agent{
-		*NewAgent("Test agent", 0),
+		*NewAgentWithStartLocation("Test agent", '0', Location{x: 2, y: 2}),
 	}
-	agents[0].location = Location{x: 1, y: 1}
 	expected := "#####\n#   #\n# 0 #\n#   #\n#####"
 
 	actual := world.ToStringWithAgents(agents)

@@ -1,7 +1,7 @@
 package pathfinding
 
 import (
-	"errors"
+	"fmt"
 	sim "simulator/core"
 
 	mapset "github.com/deckarep/golang-set/v2"
@@ -34,16 +34,12 @@ func FindPath(
 
 	for {
 		if queue.Empty() {
-			err = errors.New("no path found")
+			err = fmt.Errorf("no path found between from %v to %v", start, goal)
 			break
 		}
 
 		current, _ := queue.Pop()
 		cell := current.(Cell)
-		// fmt.Printf("Visiting %v", cell.location)
-		// fmt.Printf("Cost %d", cost)
-		// fmt.Printf("queue size %d", queue.Size())
-		// fmt.Println()
 
 		if cell.location == goal {
 			result = cell.getDataList()
@@ -58,6 +54,7 @@ func FindPath(
 					depth:    cell.depth + 1,
 					previous: &cell,
 				},
+					// Heuristic value is inverted to get priority queue to act as a min heap
 					-heuristic(cell.depth, cell.location, goal, world))
 			}
 		}
