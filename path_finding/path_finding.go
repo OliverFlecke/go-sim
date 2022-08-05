@@ -10,6 +10,7 @@ import (
 
 type Cell struct {
 	location sim.Location
+	depth    int64
 	previous *Cell
 }
 
@@ -20,7 +21,8 @@ type SearchStats struct {
 func FindPath(
 	world *sim.World,
 	start sim.Location,
-	end sim.Location) ([]sim.Location, SearchStats, error) {
+	goal sim.Location,
+	heuristic heuristic) ([]sim.Location, SearchStats, error) {
 
 	visited := mapset.NewSet[sim.Location]()
 	visited.Add(start)
@@ -36,10 +38,14 @@ func FindPath(
 			break
 		}
 
-		current, cost := queue.Pop()
+		current, _ := queue.Pop()
 		cell := current.(Cell)
+		// fmt.Printf("Visiting %v", cell.location)
+		// fmt.Printf("Cost %d", cost)
+		// fmt.Printf("queue size %d", queue.Size())
+		// fmt.Println()
 
-		if cell.location == end {
+		if cell.location == goal {
 			result = cell.getDataList()
 			break
 		}
@@ -49,9 +55,10 @@ func FindPath(
 				visited.Add(neighbor)
 				queue.Push(Cell{
 					location: neighbor,
+					depth:    cell.depth + 1,
 					previous: &cell,
 				},
-					cost-1)
+					-heuristic(cell.depth, cell.location, goal, world))
 			}
 		}
 	}

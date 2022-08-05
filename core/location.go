@@ -1,5 +1,7 @@
 package simulator
 
+import "math"
+
 type Location struct {
 	x int
 	y int
@@ -27,4 +29,8 @@ func (loc Location) MoveInDirection(dir Direction) Location {
 
 func (loc Location) ManhattanDistance(other Location) int {
 	return Abs(loc.x-other.x) + Abs(loc.y-other.y)
+}
+
+func (loc Location) DirectDistance(other Location) float64 {
+	return math.Sqrt(math.Pow(float64(loc.x), 2) + math.Pow(float64(loc.y), 2))
 }

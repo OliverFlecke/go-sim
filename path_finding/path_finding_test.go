@@ -10,7 +10,7 @@ func TestFindPath(t *testing.T) {
 	start := sim.Location{}
 	goal := sim.NewLocation(2, 2)
 
-	path, stats, err := FindPath(world, start, goal)
+	path, stats, err := FindPath(world, start, goal, BFS)
 
 	if err != nil {
 		t.Fatal(err.Error())
@@ -22,5 +22,22 @@ func TestFindPath(t *testing.T) {
 
 	if stats.visited > 13 {
 		t.Fatalf("Too many states where visited %d", stats.visited)
+	}
+}
+
+func TestFindPathWithAStar(t *testing.T) {
+	world := sim.NewGridWorld(10)
+	start := sim.Location{}
+	goal := sim.NewLocation(9, 9)
+
+	path, _, err := FindPath(world, start, goal, AStar)
+
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	t.Logf("World:\n%s", world.ToStringWithPath(path))
+	if len(path) != 19 {
+		t.Fatalf("Did not find a shortest path. Length is %d\nPath: %v", len(path), path)
 	}
 }
