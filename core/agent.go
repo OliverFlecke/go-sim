@@ -14,6 +14,10 @@ func NewAgent(name string, id int) *Agent {
 	}
 }
 
+func (a *Agent) GetLocation() Location {
+	return a.location
+}
+
 func (agent *Agent) move(dir Direction) {
 	agent.location = agent.location.MoveInDirection(dir)
 }

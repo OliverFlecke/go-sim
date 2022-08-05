@@ -51,3 +51,50 @@ func TestManhattanDistance(t *testing.T) {
 		}
 	}
 }
+
+type TestSubtraction struct {
+	a        Location
+	b        Location
+	expected Location
+}
+
+func TestSubstract(t *testing.T) {
+	data := []TestSubtraction{
+		{
+			a:        NewLocation(0, 0),
+			b:        NewLocation(1, 1),
+			expected: NewLocation(-1, -1),
+		},
+	}
+
+	for _, value := range data {
+		result := Subtract(value.a, value.b)
+		if result != value.expected {
+			t.Fatalf("Wrong value. Expected %d, got %d", value.expected, result)
+		}
+	}
+}
+
+func TestPathToDirections(t *testing.T) {
+	path := []Location{
+		NewLocation(0, 0),
+		NewLocation(0, 1),
+		NewLocation(0, 2),
+		NewLocation(1, 2),
+		NewLocation(2, 2),
+		NewLocation(1, 2),
+		NewLocation(1, 1),
+	}
+	expected := []Direction{
+		NORTH,
+		NORTH,
+		EAST,
+		EAST,
+		WEST,
+		SOUTH,
+	}
+
+	actual := PathToDirections(path)
+
+	AssertEqualSlices(t, actual, expected)
+}

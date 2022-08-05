@@ -11,3 +11,5 @@ require (
 	github.com/containerd/console v1.0.3 // indirect
 	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 )
+
+replace simulator/pathfinding => ../path_finding
