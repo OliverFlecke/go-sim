@@ -23,7 +23,7 @@ func main() {
 
 	opt := simulator.SimulationOptions{}
 	opt.SetTickDuration(300 * time.Millisecond)
-	sim := simulator.NewSimulation(&world, []simulator.Agent{*agent}, opt)
+	sim := simulator.NewSimulation(world, []simulator.Agent{*agent}, opt)
 
 	for {
 		fmt.Print("Enter goal: ")
@@ -37,7 +37,7 @@ func main() {
 		goal := simulator.NewLocation(x, y)
 		fmt.Printf("Got goal %v\n", goal)
 
-		p, _, err := pathfinding.FindPath(&world, agent.GetLocation(), goal, pathfinding.AStar)
+		p, _, err := pathfinding.FindPath(world, agent.GetLocation(), goal, pathfinding.AStar)
 		if err != nil {
 			fmt.Printf("Error: %s\n", err.Error())
 			continue

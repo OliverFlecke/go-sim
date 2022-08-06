@@ -6,13 +6,13 @@ import (
 )
 
 type Simulation struct {
-	world   *IWorld
+	world   IWorld
 	options SimulationOptions
 	agents  []Agent
 	actions map[*Agent][]Direction // TODO: Maybe introduce an action interface for this
 }
 
-func NewSimulation(world *IWorld, agents []Agent, options SimulationOptions) *Simulation {
+func NewSimulation(world IWorld, agents []Agent, options SimulationOptions) *Simulation {
 	return &Simulation{
 		world:   world,
 		agents:  agents,

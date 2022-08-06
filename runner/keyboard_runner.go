@@ -7,13 +7,13 @@ package main
 
 import (
 	"fmt"
-	simulator "simulator/core"
+	sim "simulator/core"
 
 	"atomicgo.dev/keyboard"
 	"atomicgo.dev/keyboard/keys"
 )
 
-func keyboardListener(world *simulator.IWorld, agent *simulator.Agent) {
+func keyboardListener(world sim.IWorld, agent *sim.Agent) {
 	keyboard.Listen(func(key keys.Key) (stop bool, err error) {
 		if key.Code == keys.CtrlC {
 			return true, nil
@@ -25,7 +25,7 @@ func keyboardListener(world *simulator.IWorld, agent *simulator.Agent) {
 			if !agent.MoveInWorld(world, dir) {
 				fmt.Println("Invalid move")
 			}
-			fmt.Print((*world).ToStringWithAgents([]simulator.Agent{*agent}))
+			fmt.Print(world.ToStringWithAgents([]sim.Agent{*agent}))
 		}
 
 		return false, nil
@@ -36,16 +36,16 @@ func clearScreen() {
 	fmt.Println("\033[2J")
 }
 
-func keyToDirection(key keys.Key) (simulator.Direction, bool) {
+func keyToDirection(key keys.Key) (sim.Direction, bool) {
 	switch key.Code {
 	case keys.Right:
-		return simulator.EAST, true
+		return sim.EAST, true
 	case keys.Left:
-		return simulator.WEST, true
+		return sim.WEST, true
 	case keys.Up:
-		return simulator.SOUTH, true
+		return sim.SOUTH, true
 	case keys.Down:
-		return simulator.NORTH, true
+		return sim.NORTH, true
 
 	default:
 		return 0, false

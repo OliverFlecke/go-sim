@@ -38,9 +38,9 @@ func TestNewAgent(t *testing.T) {
 
 func TestIsValidMove(t *testing.T) {
 	a := NewAgent("Test agent", 0)
-	w := (IWorld)(NewGridWorld(3))
+	w := NewGridWorld(3)
 
-	if a.IsValidMove(&w, WEST) {
+	if a.IsValidMove(w, WEST) {
 		t.Fatal("WEST is not a valid move in this situation")
 	}
 }

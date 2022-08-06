@@ -2,13 +2,14 @@ package simulationMap
 
 import (
 	"reflect"
-	simulator "simulator/core"
+	sim "simulator/core"
 	"testing"
 )
 
 func TestParseStringToMap(t *testing.T) {
-	world, err := GetStringFromFile("../../maps/00.map")
-	expected := simulator.NewGridWorld(2)
+	w, err := GetStringFromFile("../../maps/00.map")
+	world := w.(*sim.World)
+	expected := sim.NewGridWorld(2)
 
 	if err != nil {
 		t.Fatal(err)
