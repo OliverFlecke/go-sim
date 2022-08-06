@@ -42,11 +42,11 @@ func FindPath(
 		cell := current.(Cell)
 
 		if cell.location == goal {
-			result = cell.getDataList()
+			result = cell.getLocations()
 			break
 		}
 
-		for _, neighbor := range neighbors(world, cell.location) {
+		for _, neighbor := range world.Neighbors(cell.location) {
 			if !visited.Contains(neighbor) {
 				visited.Add(neighbor)
 				queue.Push(Cell{
@@ -66,26 +66,7 @@ func FindPath(
 		}, err
 }
 
-func neighbors(world *sim.World, location sim.Location) []sim.Location {
-	neighbors := make([]sim.Location, 0)
-	directions := []sim.Direction{
-		sim.NORTH,
-		sim.EAST,
-		sim.SOUTH,
-		sim.WEST,
-	}
-
-	for _, dir := range directions {
-		newLocation := location.MoveInDirection(dir)
-		if world.GetLocation(newLocation) == sim.EMPTY {
-			neighbors = append(neighbors, newLocation)
-		}
-	}
-
-	return neighbors
-}
-
-func (item *Cell) getDataList() []sim.Location {
+func (item *Cell) getLocations() []sim.Location {
 	result := make([]sim.Location, 0)
 
 	for item != nil {

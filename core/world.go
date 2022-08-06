@@ -4,22 +4,6 @@ import (
 	"strings"
 )
 
-type GridType = byte
-
-const (
-	EMPTY GridType = iota
-	WALL
-)
-
-func ToRune(g GridType) rune {
-	switch g {
-	case WALL:
-		return '#'
-	default:
-		return ' '
-	}
-}
-
 type World struct {
 	grid map[Location]GridType
 }
@@ -66,6 +50,25 @@ func (world *World) GetLocation(loc Location) GridType {
 	} else {
 		return WALL
 	}
+}
+
+func (world *World) Neighbors(location Location) []Location {
+	neighbors := make([]Location, 0)
+	directions := []Direction{
+		NORTH,
+		EAST,
+		SOUTH,
+		WEST,
+	}
+
+	for _, dir := range directions {
+		newLocation := location.MoveInDirection(dir)
+		if world.GetLocation(newLocation) == EMPTY {
+			neighbors = append(neighbors, newLocation)
+		}
+	}
+
+	return neighbors
 }
 
 func (w *World) ToString() string {
@@ -119,6 +122,8 @@ func (w *World) toStringHelper(toRune func(Location) rune) string {
 
 	return str.String()[:str.Len()-1]
 }
+
+// Private methods
 
 func (w *World) lowerRightCorner() Location {
 	result := Location{}
