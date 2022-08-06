@@ -19,7 +19,7 @@ type SearchStats struct {
 }
 
 func FindPath(
-	world *sim.World,
+	world *sim.IWorld,
 	start sim.Location,
 	goal sim.Location,
 	heuristic heuristic) ([]sim.Location, SearchStats, error) {
@@ -46,7 +46,7 @@ func FindPath(
 			break
 		}
 
-		for _, neighbor := range world.Neighbors(cell.location) {
+		for _, neighbor := range (*world).GetNeighbors(cell.location) {
 			if !visited.Contains(neighbor) {
 				visited.Add(neighbor)
 				queue.Push(Cell{

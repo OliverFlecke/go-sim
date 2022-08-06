@@ -34,3 +34,10 @@ func TestToStringWithAgents(t *testing.T) {
 		t.Fatalf(`World with agents does not look as expected '%s'. Actual: '%s'`, expected, actual)
 	}
 }
+
+func TestWorldImplementsIWord(t *testing.T) {
+	var w IWorld = (*World)(NewGridWorld(1)) // Verify that *T implements I.
+	if w.GetLocation(NewLocation(1, 1)) != EMPTY {
+		t.Fatal("Incorrect location returned from interface")
+	}
+}

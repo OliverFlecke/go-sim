@@ -5,7 +5,7 @@ import (
 	sim "simulator/core"
 )
 
-func ParseStringToWorld(text string) *sim.World {
+func ParseStringToWorld(text string) sim.IWorld {
 	grid := make(map[sim.Location]sim.GridType)
 	var x, y int
 
@@ -23,10 +23,10 @@ func ParseStringToWorld(text string) *sim.World {
 		x += 1
 	}
 
-	return sim.NewWorld(grid)
+	return (*sim.World)(sim.NewWorld(grid))
 }
 
-func GetStringFromFile(filename string) (*sim.World, error) {
+func GetStringFromFile(filename string) (sim.IWorld, error) {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err

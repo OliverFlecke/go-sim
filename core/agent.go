@@ -30,7 +30,7 @@ func (agent *Agent) move(dir Direction) {
 	agent.location = agent.location.MoveInDirection(dir)
 }
 
-func (agent *Agent) MoveInWorld(world *World, dir Direction) bool {
+func (agent *Agent) MoveInWorld(world *IWorld, dir Direction) bool {
 	if agent.IsValidMove(world, dir) {
 		agent.move(dir)
 		return true
@@ -39,7 +39,7 @@ func (agent *Agent) MoveInWorld(world *World, dir Direction) bool {
 	}
 }
 
-func (agent *Agent) IsValidMove(world *World, dir Direction) bool {
+func (agent *Agent) IsValidMove(world *IWorld, dir Direction) bool {
 	newLocation := agent.location.MoveInDirection(dir)
-	return world.GetLocation(newLocation) == EMPTY
+	return (*world).GetLocation(newLocation) == EMPTY
 }

@@ -4,6 +4,12 @@ import (
 	"strings"
 )
 
+type IWorld interface {
+	GetLocation(Location) GridType
+	GetNeighbors(Location) []Location
+	ToStringWithAgents([]Agent) string
+}
+
 type World struct {
 	grid map[Location]GridType
 }
@@ -52,7 +58,7 @@ func (world *World) GetLocation(loc Location) GridType {
 	}
 }
 
-func (world *World) Neighbors(location Location) []Location {
+func (world *World) GetNeighbors(location Location) []Location {
 	neighbors := make([]Location, 0)
 	directions := []Direction{
 		NORTH,
@@ -70,6 +76,8 @@ func (world *World) Neighbors(location Location) []Location {
 
 	return neighbors
 }
+
+// Stringify
 
 func (w *World) ToString() string {
 	return w.toStringHelper(func(l Location) rune {
