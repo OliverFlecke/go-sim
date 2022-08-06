@@ -15,3 +15,5 @@ const (
 	BOX
 	GOAL
 )
+
+type ObjectMap map[WorldObjectKey][]WorldObject

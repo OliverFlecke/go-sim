@@ -3,6 +3,7 @@ package simulator
 import (
 	dir "simulator/core/direction"
 	"simulator/core/location"
+	"simulator/core/objects"
 	"strings"
 )
 
@@ -15,35 +16,40 @@ type IWorld interface {
 type Grid map[location.Location]GridType
 
 type World struct {
-	grid Grid
+	grid    Grid
+	objects objects.ObjectMap
 }
 
-func NewWorld(grid Grid) *World {
+func NewWorld(grid Grid, objs objects.ObjectMap) *World {
 	return &World{
-		grid: grid,
+		grid:    grid,
+		objects: objs,
 	}
 }
 
 func NewGridWorld(size int) *World {
+	return &World{
+		grid: NewGrid(size),
+	}
+}
+
+func NewGrid(size int) Grid {
 	grid := make(Grid)
 
 	for y := 0; y <= size+1; y++ {
-		grid[location.NewLocation(0, y)] = WALL
-		grid[location.NewLocation(size+1, y)] = WALL
-
+		grid[location.New(0, y)] = WALL
+		grid[location.New(size+1, y)] = WALL
 	}
 
 	for x := 1; x <= size; x++ {
-		grid[location.NewLocation(x, 0)] = WALL
+		grid[location.New(x, 0)] = WALL
 		for y := 1; y <= size; y++ {
-			grid[location.NewLocation(x, y)] = EMPTY
+			grid[location.New(x, y)] = EMPTY
 		}
-		grid[location.NewLocation(x, size+1)] = WALL
+		grid[location.New(x, size+1)] = WALL
 	}
 
-	return &World{
-		grid: grid,
-	}
+	return grid
 }
 
 // Getter and Setters
@@ -127,7 +133,7 @@ func (w *World) toStringHelper(toRune func(location.Location) rune) string {
 
 	for y := 0; y <= corner.Y; y++ {
 		for x := 0; x <= corner.X; x++ {
-			str.WriteRune(toRune(location.NewLocation(x, y)))
+			str.WriteRune(toRune(location.New(x, y)))
 		}
 		str.WriteString("\n")
 	}

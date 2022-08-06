@@ -12,7 +12,7 @@ type Location struct {
 }
 
 // CONSTRUCTOR
-func NewLocation(x int, y int) Location {
+func New(x int, y int) Location {
 	return Location{X: x, Y: y}
 }
 
@@ -41,7 +41,7 @@ func (loc Location) DirectDistance(other Location) float64 {
 }
 
 func Subtract(a, b Location) Location {
-	return NewLocation(a.X-b.X, a.Y-b.Y)
+	return New(a.X-b.X, a.Y-b.Y)
 }
 
 func PathToDirections(locations []Location) []direction.Direction {

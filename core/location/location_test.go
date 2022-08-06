@@ -37,13 +37,13 @@ type TestData struct {
 func TestManhattanDistance(t *testing.T) {
 	data := []TestData{
 		{
-			a:        NewLocation(0, 0),
-			b:        NewLocation(2, 2),
+			a:        New(0, 0),
+			b:        New(2, 2),
 			expected: 4,
 		},
 		{
-			a:        NewLocation(10, 10),
-			b:        NewLocation(20, 20),
+			a:        New(10, 10),
+			b:        New(20, 20),
 			expected: 20,
 		},
 	}
@@ -65,9 +65,9 @@ type TestSubtraction struct {
 func TestSubstract(t *testing.T) {
 	data := []TestSubtraction{
 		{
-			a:        NewLocation(0, 0),
-			b:        NewLocation(1, 1),
-			expected: NewLocation(-1, -1),
+			a:        New(0, 0),
+			b:        New(1, 1),
+			expected: New(-1, -1),
 		},
 	}
 
@@ -81,13 +81,13 @@ func TestSubstract(t *testing.T) {
 
 func TestPathToDirections(t *testing.T) {
 	path := []Location{
-		NewLocation(0, 0),
-		NewLocation(0, 1),
-		NewLocation(0, 2),
-		NewLocation(1, 2),
-		NewLocation(2, 2),
-		NewLocation(1, 2),
-		NewLocation(1, 1),
+		New(0, 0),
+		New(0, 1),
+		New(0, 2),
+		New(1, 2),
+		New(2, 2),
+		New(1, 2),
+		New(1, 1),
 	}
 	expected := []direction.Direction{
 		direction.NORTH,

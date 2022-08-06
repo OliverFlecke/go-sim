@@ -16,7 +16,7 @@ func parseGridWorld(text string) sim.Grid {
 	var x, y int
 
 	for _, c := range text {
-		loc := location.NewLocation(x, y)
+		loc := location.New(x, y)
 		switch c {
 		case '\n':
 			y += 1
@@ -51,13 +51,11 @@ func parseLocation(re *regexp.Regexp, match []string) (location.Location, error)
 		return location.Location{}, err
 	}
 
-	return location.NewLocation(x, y), nil
+	return location.New(x, y), nil
 }
 
-type ObjectMap map[objects.WorldObjectKey][]objects.WorldObject
-
-func parseObjects(str string) (ObjectMap, error) {
-	result := make(ObjectMap)
+func parseObjects(str string) (objects.ObjectMap, error) {
+	result := make(objects.ObjectMap)
 
 	re := regexp.MustCompile(`(?P<type>[a-z]+) (?P<id>\w) (?P<x>\d+),(?P<y>\d+)`)
 	typeIdx := re.SubexpIndex("type")
@@ -93,11 +91,15 @@ func parseWorldFromString(content string) (sim.IWorld, error) {
 
 	grid := parseGridWorld(splits[0])
 	if len(splits) > 1 {
-		// fmt.Println(splits[1])
-		parseObjects(splits[1])
+		objs, err := parseObjects(splits[1])
+		if err != nil {
+			return nil, err
+		}
+
+		return sim.NewWorld(grid, objs), nil
 	}
 
-	return sim.NewWorld(grid), nil
+	return sim.NewWorld(grid, make(objects.ObjectMap)), nil
 }
 
 func ParseWorldFromFile(filename string) (sim.IWorld, error) {

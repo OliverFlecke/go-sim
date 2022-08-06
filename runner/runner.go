@@ -18,7 +18,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	agent := simulator.NewAgentWithStartLocation("Agent 0", '0', location.NewLocation(1, 1))
+	agent := simulator.NewAgentWithStartLocation("Agent 0", '0', location.New(1, 1))
 	fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
 	fmt.Println()
 
@@ -35,7 +35,7 @@ func main() {
 			continue
 		}
 
-		goal := location.NewLocation(x, y)
+		goal := location.New(x, y)
 		fmt.Printf("Got goal %v\n", goal)
 
 		p, _, err := pathfinding.FindPath(world, agent.GetLocation(), goal, pathfinding.AStar)

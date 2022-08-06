@@ -3,6 +3,8 @@ package simulationMap
 import (
 	"reflect"
 	sim "simulator/core"
+	"simulator/core/location"
+	"simulator/core/objects"
 	"testing"
 )
 
@@ -23,7 +25,18 @@ func TestParseStringToMap(t *testing.T) {
 
 func TestPaseMapFile(t *testing.T) {
 	w, err := ParseWorldFromFile("../../maps/02.map")
-	expected := sim.NewGridWorld(3)
+
+	objs := make(objects.ObjectMap)
+	objs[objects.AGENT] = []objects.WorldObject{
+		sim.NewAgentWithStartLocation("unused", '0', location.New(1, 1)),
+	}
+	objs[objects.BOX] = []objects.WorldObject{
+		objects.NewBox(location.New(2, 2), 'A'),
+	}
+	objs[objects.GOAL] = []objects.WorldObject{
+		objects.NewGoal(location.New(3, 3)),
+	}
+	expected := sim.NewWorld(sim.NewGrid(3), objs)
 
 	if err != nil {
 		t.Fatal(err)

@@ -9,7 +9,7 @@ import (
 func TestFindPath(t *testing.T) {
 	world := sim.NewGridWorld(4)
 	start := location.Location{}
-	goal := location.NewLocation(2, 2)
+	goal := location.New(2, 2)
 
 	path, stats, err := FindPath(world, start, goal, BFS)
 
@@ -29,7 +29,7 @@ func TestFindPath(t *testing.T) {
 func TestFindPathWithAStar(t *testing.T) {
 	world := sim.NewGridWorld(10)
 	start := location.Location{}
-	goal := location.NewLocation(9, 9)
+	goal := location.New(9, 9)
 
 	path, _, err := FindPath(world, start, goal, AStar)
 

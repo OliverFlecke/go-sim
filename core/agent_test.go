@@ -17,10 +17,10 @@ func TestMove(t *testing.T) {
 		direction.WEST,
 	}
 	locations := []location.Location{
-		location.NewLocation(0, 1),
-		location.NewLocation(1, 1),
-		location.NewLocation(1, 0),
-		location.NewLocation(0, 0),
+		location.New(0, 1),
+		location.New(1, 1),
+		location.New(1, 0),
+		location.New(0, 0),
 	}
 
 	for i, dir := range directions {
