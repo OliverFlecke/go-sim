@@ -19,8 +19,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	agent := simulator.NewAgentWithStartLocation("Agent 0", '0', location.New(1, 1))
-	fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
+	agent := world.GetObjects(objects.AGENT)[0].(*simulator.Agent)
+	fmt.Print(world.ToStringWithObjects())
 	fmt.Println()
 
 	opt := simulator.SimulationOptions{}
@@ -48,7 +48,7 @@ func main() {
 
 		for t := range ticker {
 			fmt.Printf("\n\nWorld at %s\n", t)
-			fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
+			fmt.Print(world.ToStringWithObjects())
 		}
 		fmt.Print("\nCompleted\n")
 	}
@@ -57,6 +57,7 @@ func main() {
 func getGoal(w simulator.IWorld) (location.Location, error) {
 	goals := w.GetObjects(objects.GOAL)
 	if len(goals) > 0 {
+
 		return goals[0].GetLocation(), nil
 	}
 

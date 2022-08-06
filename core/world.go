@@ -12,7 +12,7 @@ type IWorld interface {
 	GetNeighbors(location.Location) []location.Location
 	GetObjects(objects.WorldObjectKey) []objects.WorldObject
 
-	ToStringWithAgents([]Agent) string
+	ToStringWithObjects() string
 }
 
 type Grid map[location.Location]GridType
@@ -111,6 +111,26 @@ func (w *World) ToStringWithAgents(agents []Agent) string {
 		agent, found := lookup[l]
 		if found {
 			return agent.callsign
+		} else {
+			return ToRune(w.GetLocation(l))
+		}
+	})
+}
+
+func (w *World) ToStringWithObjects() string {
+	lookup := make(map[location.Location]objects.WorldObject)
+	for _, objs := range w.objects {
+		for _, obj := range objs {
+			if lookup[obj.GetLocation()] == nil {
+				lookup[obj.GetLocation()] = obj
+			}
+		}
+	}
+
+	return w.toStringHelper(func(l location.Location) rune {
+		obj, found := lookup[l]
+		if found {
+			return obj.GetRune()
 		} else {
 			return ToRune(w.GetLocation(l))
 		}

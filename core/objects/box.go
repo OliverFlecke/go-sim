@@ -13,6 +13,10 @@ func (b Box) GetLocation() location.Location {
 	return b.location
 }
 
+func (b Box) GetRune() rune {
+	return b.boxType
+}
+
 // Constructor
 func NewBox(location location.Location, boxType rune) *Box {
 	return &Box{

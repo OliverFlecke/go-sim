@@ -33,6 +33,10 @@ func (a *Agent) GetLocation() location.Location {
 	return a.location
 }
 
+func (a *Agent) GetRune() rune {
+	return a.callsign
+}
+
 // Movement functions
 func (agent *Agent) move(dir direction.Direction) {
 	agent.location = agent.location.MoveInDirection(dir)

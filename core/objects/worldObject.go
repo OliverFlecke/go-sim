@@ -6,6 +6,7 @@ import (
 
 type WorldObject interface {
 	GetLocation() location.Location
+	GetRune() rune
 }
 
 type WorldObjectKey byte
