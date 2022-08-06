@@ -1,13 +1,16 @@
 package simulator
 
-import "testing"
+import (
+	"simulator/core/direction"
+	"testing"
+)
 
 func TestMoveInDirection(t *testing.T) {
-	directions := []Direction{
-		NORTH,
-		EAST,
-		SOUTH,
-		WEST,
+	directions := []direction.Direction{
+		direction.NORTH,
+		direction.EAST,
+		direction.SOUTH,
+		direction.WEST,
 	}
 	expected := []Location{
 		{x: 0, y: 1},
@@ -85,13 +88,13 @@ func TestPathToDirections(t *testing.T) {
 		NewLocation(1, 2),
 		NewLocation(1, 1),
 	}
-	expected := []Direction{
-		NORTH,
-		NORTH,
-		EAST,
-		EAST,
-		WEST,
-		SOUTH,
+	expected := []direction.Direction{
+		direction.NORTH,
+		direction.NORTH,
+		direction.EAST,
+		direction.EAST,
+		direction.WEST,
+		direction.SOUTH,
 	}
 
 	actual := PathToDirections(path)

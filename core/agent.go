@@ -1,5 +1,7 @@
 package simulator
 
+import "simulator/core/direction"
+
 type Agent struct {
 	callsign rune
 	name     string
@@ -29,11 +31,11 @@ func (a *Agent) GetLocation() Location {
 }
 
 // Movement functions
-func (agent *Agent) move(dir Direction) {
+func (agent *Agent) move(dir direction.Direction) {
 	agent.location = agent.location.MoveInDirection(dir)
 }
 
-func (agent *Agent) MoveInWorld(world IWorld, dir Direction) bool {
+func (agent *Agent) MoveInWorld(world IWorld, dir direction.Direction) bool {
 	if agent.IsValidMove(world, dir) {
 		agent.move(dir)
 		return true
@@ -42,7 +44,7 @@ func (agent *Agent) MoveInWorld(world IWorld, dir Direction) bool {
 	}
 }
 
-func (agent *Agent) IsValidMove(world IWorld, dir Direction) bool {
+func (agent *Agent) IsValidMove(world IWorld, dir direction.Direction) bool {
 	newLocation := agent.location.MoveInDirection(dir)
 	return world.GetLocation(newLocation) == EMPTY
 }

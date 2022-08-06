@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	dir "simulator/core/direction"
 	"strings"
 )
 
@@ -62,11 +63,11 @@ func (world *World) GetLocation(loc Location) GridType {
 
 func (world *World) GetNeighbors(location Location) []Location {
 	neighbors := make([]Location, 0)
-	directions := []Direction{
-		NORTH,
-		EAST,
-		SOUTH,
-		WEST,
+	directions := []dir.Direction{
+		dir.NORTH,
+		dir.EAST,
+		dir.SOUTH,
+		dir.WEST,
 	}
 
 	for _, dir := range directions {

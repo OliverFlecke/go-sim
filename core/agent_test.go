@@ -2,16 +2,17 @@ package simulator
 
 import (
 	"fmt"
+	"simulator/core/direction"
 	"testing"
 )
 
 func TestMove(t *testing.T) {
 	agent := NewAgent("test agent", 0)
-	directions := []Direction{
-		NORTH,
-		EAST,
-		SOUTH,
-		WEST,
+	directions := []direction.Direction{
+		direction.NORTH,
+		direction.EAST,
+		direction.SOUTH,
+		direction.WEST,
 	}
 	locations := []Location{
 		{x: 0, y: 1},
@@ -40,7 +41,7 @@ func TestIsValidMove(t *testing.T) {
 	a := NewAgent("Test agent", 0)
 	w := NewGridWorld(3)
 
-	if a.IsValidMove(w, WEST) {
+	if a.IsValidMove(w, direction.WEST) {
 		t.Fatal("WEST is not a valid move in this situation")
 	}
 }

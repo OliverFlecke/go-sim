@@ -8,6 +8,7 @@ package main
 import (
 	"fmt"
 	sim "simulator/core"
+	"simulator/core/direction"
 
 	"atomicgo.dev/keyboard"
 	"atomicgo.dev/keyboard/keys"
@@ -36,16 +37,16 @@ func clearScreen() {
 	fmt.Println("\033[2J")
 }
 
-func keyToDirection(key keys.Key) (sim.Direction, bool) {
+func keyToDirection(key keys.Key) (direction.Direction, bool) {
 	switch key.Code {
 	case keys.Right:
-		return sim.EAST, true
+		return direction.EAST, true
 	case keys.Left:
-		return sim.WEST, true
+		return direction.WEST, true
 	case keys.Up:
-		return sim.SOUTH, true
+		return direction.SOUTH, true
 	case keys.Down:
-		return sim.NORTH, true
+		return direction.NORTH, true
 
 	default:
 		return 0, false

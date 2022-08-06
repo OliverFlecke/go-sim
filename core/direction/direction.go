@@ -1,4 +1,4 @@
-package simulator
+package direction
 
 type Direction byte
 

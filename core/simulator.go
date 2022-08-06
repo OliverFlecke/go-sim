@@ -2,6 +2,7 @@ package simulator
 
 import (
 	"fmt"
+	"simulator/core/direction"
 	"time"
 )
 
@@ -9,7 +10,7 @@ type Simulation struct {
 	world   IWorld
 	options SimulationOptions
 	agents  []Agent
-	actions map[*Agent][]Direction // TODO: Maybe introduce an action interface for this
+	actions map[*Agent][]direction.Direction // TODO: Maybe introduce an action interface for this
 }
 
 func NewSimulation(world IWorld, agents []Agent, options SimulationOptions) *Simulation {
@@ -17,7 +18,7 @@ func NewSimulation(world IWorld, agents []Agent, options SimulationOptions) *Sim
 		world:   world,
 		agents:  agents,
 		options: options,
-		actions: make(map[*Agent][]Direction),
+		actions: make(map[*Agent][]direction.Direction),
 	}
 }
 
@@ -63,6 +64,6 @@ func (s *Simulation) Run(quit chan bool) <-chan time.Time {
 	return output
 }
 
-func (s *Simulation) SetActions(agent *Agent, directions []Direction) {
+func (s *Simulation) SetActions(agent *Agent, directions []direction.Direction) {
 	s.actions[agent] = append(s.actions[agent], directions...)
 }
