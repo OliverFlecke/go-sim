@@ -10,18 +10,20 @@ type IWorld interface {
 	ToStringWithAgents([]Agent) string
 }
 
+type Grid map[Location]GridType
+
 type World struct {
-	grid map[Location]GridType
+	grid Grid
 }
 
-func NewWorld(grid map[Location]GridType) *World {
+func NewWorld(grid Grid) *World {
 	return &World{
 		grid: grid,
 	}
 }
 
 func NewGridWorld(size int) *World {
-	grid := make(map[Location]GridType)
+	grid := make(Grid)
 
 	for y := 0; y <= size+1; y++ {
 		grid[NewLocation(0, y)] = WALL
@@ -43,7 +45,7 @@ func NewGridWorld(size int) *World {
 }
 
 // Getter and Setters
-func (w *World) GetMap() map[Location]GridType {
+func (w *World) GetMap() Grid {
 	return w.grid
 }
 

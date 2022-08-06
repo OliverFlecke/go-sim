@@ -6,6 +6,7 @@ type Agent struct {
 	location Location
 }
 
+// Simple constructor
 func NewAgent(name string, callsign rune) *Agent {
 	return &Agent{
 		callsign: callsign,
@@ -22,10 +23,12 @@ func NewAgentWithStartLocation(name string, callsign rune, start Location) *Agen
 	}
 }
 
+// Implements WorldObject interface
 func (a *Agent) GetLocation() Location {
 	return a.location
 }
 
+// Movement functions
 func (agent *Agent) move(dir Direction) {
 	agent.location = agent.location.MoveInDirection(dir)
 }

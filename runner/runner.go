@@ -12,7 +12,7 @@ import (
 func main() {
 	fmt.Println("Starting simulation...")
 	mapName := "maps/01.map"
-	world, err := maps.GetStringFromFile(mapName)
+	world, err := maps.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
 	}
