@@ -1,4 +1,4 @@
-package simulator
+package utils
 
 func Abs(value int) int {
 	if value < 0 {

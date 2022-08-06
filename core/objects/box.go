@@ -1,20 +1,20 @@
 package objects
 
-import sim "simulator/core"
+import "simulator/core/location"
 
 type Box struct {
-	location sim.Location
+	location location.Location
 	boxType  rune
 }
 
 // IMPL: WorldObject interface
 
-func (b Box) GetLocation() sim.Location {
+func (b Box) GetLocation() location.Location {
 	return b.location
 }
 
 // Constructor
-func NewBox(location sim.Location, boxType rune) *Box {
+func NewBox(location location.Location, boxType rune) *Box {
 	return &Box{
 		location: location,
 		boxType:  boxType,

@@ -1,6 +1,9 @@
 package simulator
 
-import "testing"
+import (
+	"simulator/core/location"
+	"testing"
+)
 
 func TestNewGridWorld(t *testing.T) {
 	world := NewGridWorld(10)
@@ -24,7 +27,7 @@ func TestToString(t *testing.T) {
 func TestToStringWithAgents(t *testing.T) {
 	world := NewGridWorld(3)
 	agents := []Agent{
-		*NewAgentWithStartLocation("Test agent", '0', Location{x: 2, y: 2}),
+		*NewAgentWithStartLocation("Test agent", '0', location.NewLocation(2, 2)),
 	}
 	expected := "#####\n#   #\n# 0 #\n#   #\n#####"
 
@@ -37,7 +40,7 @@ func TestToStringWithAgents(t *testing.T) {
 
 func TestWorldImplementsIWord(t *testing.T) {
 	var w IWorld = (*World)(NewGridWorld(1)) // Verify that *T implements I.
-	if w.GetLocation(NewLocation(1, 1)) != EMPTY {
+	if w.GetLocation(location.NewLocation(1, 1)) != EMPTY {
 		t.Fatal("Incorrect location returned from interface")
 	}
 }

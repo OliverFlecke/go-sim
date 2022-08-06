@@ -2,16 +2,17 @@ package simulator
 
 import (
 	dir "simulator/core/direction"
+	"simulator/core/location"
 	"strings"
 )
 
 type IWorld interface {
-	GetLocation(Location) GridType
-	GetNeighbors(Location) []Location
+	GetLocation(location.Location) GridType
+	GetNeighbors(location.Location) []location.Location
 	ToStringWithAgents([]Agent) string
 }
 
-type Grid map[Location]GridType
+type Grid map[location.Location]GridType
 
 type World struct {
 	grid Grid
@@ -27,17 +28,17 @@ func NewGridWorld(size int) *World {
 	grid := make(Grid)
 
 	for y := 0; y <= size+1; y++ {
-		grid[NewLocation(0, y)] = WALL
-		grid[NewLocation(size+1, y)] = WALL
+		grid[location.NewLocation(0, y)] = WALL
+		grid[location.NewLocation(size+1, y)] = WALL
 
 	}
 
 	for x := 1; x <= size; x++ {
-		grid[NewLocation(x, 0)] = WALL
+		grid[location.NewLocation(x, 0)] = WALL
 		for y := 1; y <= size; y++ {
-			grid[Location{x: x, y: y}] = EMPTY
+			grid[location.NewLocation(x, y)] = EMPTY
 		}
-		grid[NewLocation(x, size+1)] = WALL
+		grid[location.NewLocation(x, size+1)] = WALL
 	}
 
 	return &World{
@@ -52,7 +53,7 @@ func (w *World) GetMap() Grid {
 
 // Methods
 
-func (world *World) GetLocation(loc Location) GridType {
+func (world *World) GetLocation(loc location.Location) GridType {
 	result, found := world.grid[loc]
 	if found {
 		return result
@@ -61,8 +62,8 @@ func (world *World) GetLocation(loc Location) GridType {
 	}
 }
 
-func (world *World) GetNeighbors(location Location) []Location {
-	neighbors := make([]Location, 0)
+func (world *World) GetNeighbors(loc location.Location) []location.Location {
+	neighbors := make([]location.Location, 0)
 	directions := []dir.Direction{
 		dir.NORTH,
 		dir.EAST,
@@ -71,7 +72,7 @@ func (world *World) GetNeighbors(location Location) []Location {
 	}
 
 	for _, dir := range directions {
-		newLocation := location.MoveInDirection(dir)
+		newLocation := loc.MoveInDirection(dir)
 		if world.GetLocation(newLocation) == EMPTY {
 			neighbors = append(neighbors, newLocation)
 		}
@@ -83,18 +84,18 @@ func (world *World) GetNeighbors(location Location) []Location {
 // Stringify
 
 func (w *World) ToString() string {
-	return w.toStringHelper(func(l Location) rune {
+	return w.toStringHelper(func(l location.Location) rune {
 		return ToRune(w.GetLocation(l))
 	})
 }
 
 func (w *World) ToStringWithAgents(agents []Agent) string {
-	lookup := make(map[Location]Agent)
+	lookup := make(map[location.Location]Agent)
 	for _, agent := range agents {
 		lookup[agent.location] = agent
 	}
 
-	return w.toStringHelper(func(l Location) rune {
+	return w.toStringHelper(func(l location.Location) rune {
 		agent, found := lookup[l]
 		if found {
 			return agent.callsign
@@ -104,13 +105,13 @@ func (w *World) ToStringWithAgents(agents []Agent) string {
 	})
 }
 
-func (w *World) ToStringWithPath(path []Location) string {
-	lookup := make(map[Location]rune)
+func (w *World) ToStringWithPath(path []location.Location) string {
+	lookup := make(map[location.Location]rune)
 	for _, location := range path {
 		lookup[location] = 'x'
 	}
 
-	return w.toStringHelper(func(l Location) rune {
+	return w.toStringHelper(func(l location.Location) rune {
 		r, found := lookup[l]
 		if found {
 			return r
@@ -120,13 +121,13 @@ func (w *World) ToStringWithPath(path []Location) string {
 	})
 }
 
-func (w *World) toStringHelper(toRune func(Location) rune) string {
+func (w *World) toStringHelper(toRune func(location.Location) rune) string {
 	var str strings.Builder
 	corner := w.lowerRightCorner()
 
-	for y := 0; y <= corner.y; y++ {
-		for x := 0; x <= corner.x; x++ {
-			str.WriteRune(toRune(Location{x: x, y: y}))
+	for y := 0; y <= corner.Y; y++ {
+		for x := 0; x <= corner.X; x++ {
+			str.WriteRune(toRune(location.NewLocation(x, y)))
 		}
 		str.WriteString("\n")
 	}
@@ -136,14 +137,14 @@ func (w *World) toStringHelper(toRune func(Location) rune) string {
 
 // Private methods
 
-func (w *World) lowerRightCorner() Location {
-	result := Location{}
+func (w *World) lowerRightCorner() location.Location {
+	result := location.Location{}
 	for key := range w.grid {
-		if result.x < key.x {
-			result.x = key.x
+		if result.X < key.X {
+			result.X = key.X
 		}
-		if result.y < key.y {
-			result.y = key.y
+		if result.Y < key.Y {
+			result.Y = key.Y
 		}
 	}
 

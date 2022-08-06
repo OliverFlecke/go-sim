@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	simulator "simulator/core"
+	"simulator/core/location"
 	maps "simulator/core/map"
 	pathfinding "simulator/path_finding"
 	"time"
@@ -17,7 +18,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	agent := simulator.NewAgentWithStartLocation("Agent 0", '0', simulator.NewLocation(1, 1))
+	agent := simulator.NewAgentWithStartLocation("Agent 0", '0', location.NewLocation(1, 1))
 	fmt.Print(world.ToStringWithAgents([]simulator.Agent{*agent}))
 	fmt.Println()
 
@@ -34,7 +35,7 @@ func main() {
 			continue
 		}
 
-		goal := simulator.NewLocation(x, y)
+		goal := location.NewLocation(x, y)
 		fmt.Printf("Got goal %v\n", goal)
 
 		p, _, err := pathfinding.FindPath(world, agent.GetLocation(), goal, pathfinding.AStar)
@@ -43,7 +44,7 @@ func main() {
 			continue
 		}
 
-		sim.SetActions(agent, simulator.PathToDirections(p))
+		sim.SetActions(agent, location.PathToDirections(p))
 		quit := make(chan bool)
 		ticker := sim.Run(quit)
 

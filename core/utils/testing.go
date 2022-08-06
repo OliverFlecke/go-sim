@@ -1,4 +1,4 @@
-package simulator
+package utils
 
 import (
 	"reflect"

@@ -1,11 +1,14 @@
 package simulator
 
-import "simulator/core/direction"
+import (
+	"simulator/core/direction"
+	"simulator/core/location"
+)
 
 type Agent struct {
 	callsign rune
 	name     string
-	location Location
+	location location.Location
 }
 
 // Simple constructor
@@ -13,11 +16,11 @@ func NewAgent(name string, callsign rune) *Agent {
 	return &Agent{
 		callsign: callsign,
 		name:     name,
-		location: Location{},
+		location: location.Location{},
 	}
 }
 
-func NewAgentWithStartLocation(name string, callsign rune, start Location) *Agent {
+func NewAgentWithStartLocation(name string, callsign rune, start location.Location) *Agent {
 	return &Agent{
 		callsign: callsign,
 		name:     name,
@@ -26,7 +29,7 @@ func NewAgentWithStartLocation(name string, callsign rune, start Location) *Agen
 }
 
 // Implements WorldObject interface
-func (a *Agent) GetLocation() Location {
+func (a *Agent) GetLocation() location.Location {
 	return a.location
 }
 

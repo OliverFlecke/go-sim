@@ -3,6 +3,8 @@ package simulator
 import (
 	"fmt"
 	"simulator/core/direction"
+	"simulator/core/location"
+	"simulator/core/utils"
 	"testing"
 )
 
@@ -14,11 +16,11 @@ func TestMove(t *testing.T) {
 		direction.SOUTH,
 		direction.WEST,
 	}
-	locations := []Location{
-		{x: 0, y: 1},
-		{x: 1, y: 1},
-		{x: 1, y: 0},
-		{x: 0, y: 0},
+	locations := []location.Location{
+		location.NewLocation(0, 1),
+		location.NewLocation(1, 1),
+		location.NewLocation(1, 0),
+		location.NewLocation(0, 0),
 	}
 
 	for i, dir := range directions {
@@ -33,8 +35,8 @@ func TestMove(t *testing.T) {
 func TestNewAgent(t *testing.T) {
 	a := NewAgent("Agent A", 'A')
 	b := NewAgent("Agent B", 'B')
-	AssertEqual(t, a.callsign, 'A')
-	AssertEqual(t, b.callsign, 'B')
+	utils.AssertEqual(t, a.callsign, 'A')
+	utils.AssertEqual(t, b.callsign, 'B')
 }
 
 func TestIsValidMove(t *testing.T) {

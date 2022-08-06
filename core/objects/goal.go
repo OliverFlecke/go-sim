@@ -1,20 +1,20 @@
 package objects
 
-import sim "simulator/core"
+import "simulator/core/location"
 
 type Goal struct {
-	location sim.Location
+	location location.Location
 }
 
 // IMPL: WorldObject interface
 
-func (g Goal) GetLocation() sim.Location {
+func (g Goal) GetLocation() location.Location {
 	return g.location
 }
 
 // CONSTRUCTORS
 
-func NewGoal(location sim.Location) *Goal {
+func NewGoal(location location.Location) *Goal {
 	return &Goal{
 		location: location,
 	}

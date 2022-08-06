@@ -1,9 +1,11 @@
 package objects
 
-import simulator "simulator/core"
+import (
+	"simulator/core/location"
+)
 
 type WorldObject interface {
-	GetLocation() simulator.Location
+	GetLocation() location.Location
 }
 
 type WorldObjectKey byte

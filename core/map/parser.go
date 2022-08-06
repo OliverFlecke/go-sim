@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"regexp"
 	sim "simulator/core"
+	"simulator/core/location"
 	"simulator/core/objects"
-	obj "simulator/core/objects"
 	"strconv"
 	"strings"
 )
@@ -16,7 +16,7 @@ func parseGridWorld(text string) sim.Grid {
 	var x, y int
 
 	for _, c := range text {
-		loc := sim.NewLocation(x, y)
+		loc := location.NewLocation(x, y)
 		switch c {
 		case '\n':
 			y += 1
@@ -41,17 +41,17 @@ func parseInt(str string) (int, error) {
 	return int(v), nil
 }
 
-func parseLocation(re *regexp.Regexp, match []string) (sim.Location, error) {
+func parseLocation(re *regexp.Regexp, match []string) (location.Location, error) {
 	x, err := parseInt(match[re.SubexpIndex("x")])
 	if err != nil {
-		return sim.Location{}, err
+		return location.Location{}, err
 	}
 	y, err := parseInt(match[re.SubexpIndex("y")])
 	if err != nil {
-		return sim.Location{}, err
+		return location.Location{}, err
 	}
 
-	return sim.NewLocation(x, y), nil
+	return location.NewLocation(x, y), nil
 }
 
 type ObjectMap map[objects.WorldObjectKey][]objects.WorldObject
@@ -72,13 +72,13 @@ func parseObjects(str string) (ObjectMap, error) {
 			switch match[typeIdx] {
 			case "agent":
 				agent := sim.NewAgentWithStartLocation("unused", callsign, loc)
-				result[obj.AGENT] = append(result[obj.AGENT], agent)
+				result[objects.AGENT] = append(result[objects.AGENT], agent)
 			case "box":
-				box := obj.NewBox(loc, callsign)
-				result[obj.BOX] = append(result[obj.BOX], box)
+				box := objects.NewBox(loc, callsign)
+				result[objects.BOX] = append(result[objects.BOX], box)
 			case "goal":
-				goal := obj.NewGoal(loc)
-				result[obj.GOAL] = append(result[obj.GOAL], goal)
+				goal := objects.NewGoal(loc)
+				result[objects.GOAL] = append(result[objects.GOAL], goal)
 			default:
 				return nil, fmt.Errorf("unable to handle type: '%s'", match[typeIdx])
 			}

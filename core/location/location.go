@@ -1,45 +1,47 @@
-package simulator
+package location
 
 import (
 	"math"
 	"simulator/core/direction"
+	"simulator/core/utils"
 )
 
 type Location struct {
-	x int
-	y int
+	X int
+	Y int
 }
 
+// CONSTRUCTOR
 func NewLocation(x int, y int) Location {
-	return Location{x: x, y: y}
+	return Location{X: x, Y: y}
 }
 
 func (loc Location) MoveInDirection(dir direction.Direction) Location {
 	result := loc
 	switch dir {
 	case direction.NORTH:
-		result.y += 1
+		result.Y += 1
 	case direction.SOUTH:
-		result.y -= 1
+		result.Y -= 1
 	case direction.EAST:
-		result.x += 1
+		result.X += 1
 	case direction.WEST:
-		result.x -= 1
+		result.X -= 1
 	}
 
 	return result
 }
 
 func (loc Location) ManhattanDistance(other Location) int {
-	return Abs(loc.x-other.x) + Abs(loc.y-other.y)
+	return utils.Abs(loc.X-other.X) + utils.Abs(loc.Y-other.Y)
 }
 
 func (loc Location) DirectDistance(other Location) float64 {
-	return math.Sqrt(math.Pow(float64(loc.x), 2) + math.Pow(float64(loc.y), 2))
+	return math.Sqrt(math.Pow(float64(loc.X), 2) + math.Pow(float64(loc.Y), 2))
 }
 
 func Subtract(a, b Location) Location {
-	return NewLocation(a.x-b.x, a.y-b.y)
+	return NewLocation(a.X-b.X, a.Y-b.Y)
 }
 
 func PathToDirections(locations []Location) []direction.Direction {
@@ -49,10 +51,10 @@ func PathToDirections(locations []Location) []direction.Direction {
 	}
 
 	lookup := make(map[Location]direction.Direction)
-	lookup[Location{x: 0, y: 1}] = direction.NORTH
-	lookup[Location{x: 0, y: -1}] = direction.SOUTH
-	lookup[Location{x: 1, y: 0}] = direction.EAST
-	lookup[Location{x: -1, y: 0}] = direction.WEST
+	lookup[Location{X: 0, Y: 1}] = direction.NORTH
+	lookup[Location{X: 0, Y: -1}] = direction.SOUTH
+	lookup[Location{X: 1, Y: 0}] = direction.EAST
+	lookup[Location{X: -1, Y: 0}] = direction.WEST
 
 	for i := 1; i < len(locations); i++ {
 		result = append(result, lookup[Subtract(locations[i], locations[i-1])])

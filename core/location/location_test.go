@@ -1,7 +1,8 @@
-package simulator
+package location
 
 import (
 	"simulator/core/direction"
+	"simulator/core/utils"
 	"testing"
 )
 
@@ -13,10 +14,10 @@ func TestMoveInDirection(t *testing.T) {
 		direction.WEST,
 	}
 	expected := []Location{
-		{x: 0, y: 1},
-		{x: 1, y: 0},
-		{x: 0, y: -1},
-		{x: -1, y: 0},
+		{X: 0, Y: 1},
+		{X: 1, Y: 0},
+		{X: 0, Y: -1},
+		{X: -1, Y: 0},
 	}
 
 	for i, dir := range directions {
@@ -99,5 +100,5 @@ func TestPathToDirections(t *testing.T) {
 
 	actual := PathToDirections(path)
 
-	AssertEqualSlices(t, actual, expected)
+	utils.AssertEqualSlices(t, actual, expected)
 }

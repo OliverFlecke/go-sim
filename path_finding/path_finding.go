@@ -3,13 +3,14 @@ package pathfinding
 import (
 	"fmt"
 	sim "simulator/core"
+	"simulator/core/location"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	prque "github.com/ethereum/go-ethereum/common/prque"
 )
 
 type Cell struct {
-	location sim.Location
+	location location.Location
 	depth    int64
 	previous *Cell
 }
@@ -20,16 +21,16 @@ type SearchStats struct {
 
 func FindPath(
 	world sim.IWorld,
-	start sim.Location,
-	goal sim.Location,
-	heuristic heuristic) ([]sim.Location, SearchStats, error) {
+	start location.Location,
+	goal location.Location,
+	heuristic heuristic) ([]location.Location, SearchStats, error) {
 
-	visited := mapset.NewSet[sim.Location]()
+	visited := mapset.NewSet[location.Location]()
 	visited.Add(start)
 	queue := prque.New(nil)
 	queue.Push(Cell{location: start}, 0)
 
-	var result []sim.Location
+	var result []location.Location
 	var err error
 
 	for {
@@ -66,8 +67,8 @@ func FindPath(
 		}, err
 }
 
-func (item *Cell) getLocations() []sim.Location {
-	result := make([]sim.Location, 0)
+func (item *Cell) getLocations() []location.Location {
+	result := make([]location.Location, 0)
 
 	for item != nil {
 		result = append(result, item.location)
