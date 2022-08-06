@@ -10,6 +10,8 @@ import (
 type IWorld interface {
 	GetLocation(location.Location) GridType
 	GetNeighbors(location.Location) []location.Location
+	GetObjects(objects.WorldObjectKey) []objects.WorldObject
+
 	ToStringWithAgents([]Agent) string
 }
 
@@ -57,7 +59,7 @@ func (w *World) GetMap() Grid {
 	return w.grid
 }
 
-// Methods
+// IMPL: IWorld interface
 
 func (world *World) GetLocation(loc location.Location) GridType {
 	result, found := world.grid[loc]
@@ -85,6 +87,10 @@ func (world *World) GetNeighbors(loc location.Location) []location.Location {
 	}
 
 	return neighbors
+}
+
+func (w *World) GetObjects(key objects.WorldObjectKey) []objects.WorldObject {
+	return w.objects[key]
 }
 
 // Stringify

@@ -6,13 +6,14 @@ import (
 	simulator "simulator/core"
 	"simulator/core/location"
 	maps "simulator/core/map"
+	"simulator/core/objects"
 	pathfinding "simulator/path_finding"
 	"time"
 )
 
 func main() {
 	fmt.Println("Starting simulation...")
-	mapName := "maps/01.map"
+	mapName := "maps/02.map"
 	world, err := maps.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
@@ -27,15 +28,12 @@ func main() {
 	sim := simulator.NewSimulation(world, []simulator.Agent{*agent}, opt)
 
 	for {
-		fmt.Print("Enter goal: ")
-		var x, y int
-		_, err := fmt.Scanf("%d,%d", &x, &y)
+		goal, err := getGoal(world)
 		if err != nil {
-			fmt.Print(err)
+			fmt.Println(err)
 			continue
 		}
 
-		goal := location.New(x, y)
 		fmt.Printf("Got goal %v\n", goal)
 
 		p, _, err := pathfinding.FindPath(world, agent.GetLocation(), goal, pathfinding.AStar)
@@ -54,4 +52,20 @@ func main() {
 		}
 		fmt.Print("\nCompleted\n")
 	}
+}
+
+func getGoal(w simulator.IWorld) (location.Location, error) {
+	goals := w.GetObjects(objects.GOAL)
+	if len(goals) > 0 {
+		return goals[0].GetLocation(), nil
+	}
+
+	fmt.Print("Enter goal: ")
+	var x, y int
+	_, err := fmt.Scanf("%d,%d", &x, &y)
+	if err != nil {
+		return location.Location{}, err
+	}
+
+	return location.New(x, y), nil
 }
