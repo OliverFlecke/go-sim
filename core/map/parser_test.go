@@ -34,7 +34,7 @@ func TestPaseMapFile(t *testing.T) {
 		objects.NewBox(location.New(2, 2), 'A'),
 	}
 	objs[objects.GOAL] = []objects.WorldObject{
-		objects.NewGoal(location.New(3, 3)),
+		objects.NewGoal(location.New(3, 3), 'a'),
 	}
 	expected := sim.NewWorld(sim.NewGrid(3), objs)
 

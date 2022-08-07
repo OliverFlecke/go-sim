@@ -4,6 +4,7 @@ import (
 	"fmt"
 	sim "simulator/core"
 	"simulator/core/location"
+	"simulator/core/objects"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	prque "github.com/ethereum/go-ethereum/common/prque"
@@ -26,7 +27,7 @@ Uses BFS to find the nearest location.
 func FindLocation(
 	world sim.IWorld,
 	start location.Location,
-	predicate func(location.Location) bool) (*location.Location, error) {
+	predicate func(location.Location) objects.WorldObject) (objects.WorldObject, error) {
 
 	visited := mapset.NewSet[location.Location]()
 	visited.Add(start)
@@ -37,8 +38,9 @@ func FindLocation(
 		current, _ := queue.Pop()
 		cell := current.(Cell)
 
-		if predicate(cell.location) {
-			return &cell.location, nil
+		obj := predicate(cell.location)
+		if obj != nil {
+			return obj, nil
 		}
 
 		for _, neighbor := range world.GetNeighbors(cell.location) {

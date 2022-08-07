@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	simulator "simulator/core"
 	"simulator/core/direction"
 	"simulator/core/location"
@@ -16,7 +17,7 @@ import (
 
 func main() {
 	fmt.Println("Starting simulation...")
-	mapName := "maps/02.map"
+	mapName := os.Args[1]
 	world, err := maps.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
@@ -30,29 +31,48 @@ func main() {
 	opt.SetTickDuration(250 * time.Millisecond)
 	sim := simulator.NewSimulation(world, []simulator.Agent{*agent}, opt)
 
+	goalId := 0
+
 	for {
-		goal, err := getGoal(world)
-		if err != nil {
-			fmt.Println(err)
+		goal := getGoal(world, goalId)
+		if goal == nil {
+			fmt.Printf("\nNo more goals to solve. Closing simulator")
 			return
 		}
 
 		fmt.Printf("Got goal %v\n", goal)
-		boxLocation, err := findBox(world, agent.GetLocation(), *goal)
+		box, err := findBox(world, agent.GetLocation(), *goal)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		p, _, err := pathfinding.FindPath(world, agent.GetLocation(), *boxLocation, pathfinding.AStar)
+		p, _, err := pathfinding.FindPath(
+			world,
+			agent.GetLocation(),
+			box.GetLocation(),
+			pathfinding.AStar)
 		if err != nil {
 			fmt.Printf("Error: %s\n", err.Error())
 			continue
 		}
 
 		actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) simulator.Action {
-			return simulator.NewMoveAction(dir)
+			return simulator.NewActionMove(dir)
 		})
+		p, _, err = pathfinding.FindPath(
+			world,
+			box.GetLocation(),
+			goal.GetLocation(),
+			pathfinding.AStar)
+		if err != nil {
+			fmt.Printf("Unable to find path from box to goal. Error: %s\n", err.Error())
+			return
+		}
+		actions = append(actions, utils.Mapi(location.PathToDirections(p),
+			func(_ int, dir direction.Direction) simulator.Action {
+				return simulator.NewActionMoveWithBox(dir, box)
+			})...)
 
 		sim.SetActions(agent, actions)
 		quit := make(chan bool)
@@ -62,33 +82,40 @@ func main() {
 			fmt.Printf("\n\nWorld at %s\n", t)
 			fmt.Print(world.ToStringWithObjects())
 		}
-		fmt.Print("\nCompleted\n")
+		// fmt.Print("\nCompleted\n")
+		goalId += 1
 	}
 }
 
-func getGoal(w simulator.IWorld) (*objects.Goal, error) {
+func getGoal(w simulator.IWorld, i int) *objects.Goal {
 	goals := w.GetObjects(objects.GOAL)
-	if len(goals) > 0 {
-		return goals[0].(*objects.Goal), nil
+	if len(goals) > i {
+		return goals[i].(*objects.Goal)
 	}
 
-	return nil, fmt.Errorf("no goals found")
+	return nil
 }
 
 func findBox(
 	world simulator.IWorld,
 	start location.Location,
-	goal objects.Goal) (*location.Location, error) {
-	return pathfinding.FindLocation(world, start, func(l location.Location) bool {
+	goal objects.Goal) (*objects.Box, error) {
+	obj, err := pathfinding.FindLocation(world, start, func(l location.Location) objects.WorldObject {
 		for _, obj := range world.GetObjectsAtLocation(l) {
 			switch v := obj.(type) {
 			case *objects.Box:
 				if unicode.ToLower(v.GetType()) == goal.GetRune() {
-					return true
+					return obj
 				}
 			}
 		}
 
-		return false
+		return nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return obj.(*objects.Box), nil
 }
