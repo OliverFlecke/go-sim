@@ -41,5 +41,5 @@ func NewActionMoveWithBox(
 
 func (action MoveWithBoxAction) Perform(a *Agent, w *IWorld) {
 	a.MoveInWorld(*w, action.dir)
-	action.box.MoveInDirection(action.dir)
+	(*w).MoveObject(action.box, action.box.GetLocation().MoveInDirection(action.dir))
 }

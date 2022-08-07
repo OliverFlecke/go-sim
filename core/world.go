@@ -4,6 +4,7 @@ import (
 	dir "simulator/core/direction"
 	"simulator/core/location"
 	"simulator/core/objects"
+	"simulator/core/utils"
 	"strings"
 )
 
@@ -12,21 +13,25 @@ type IWorld interface {
 	GetNeighbors(location.Location) []location.Location
 	GetObjects(objects.WorldObjectKey) []objects.WorldObject
 	GetObjectsAtLocation(location.Location) []objects.WorldObject
+	MoveObject(o objects.WorldObject, newLoc location.Location)
 
 	ToStringWithObjects() string
 }
 
+type WorldObjectMap map[location.Location][]objects.WorldObject
 type Grid map[location.Location]GridType
 
 type World struct {
-	grid    Grid
-	objects objects.ObjectMap
+	grid      Grid
+	objects   objects.ObjectMap
+	objectMap WorldObjectMap
 }
 
-func NewWorld(grid Grid, objs objects.ObjectMap) *World {
+func NewWorld(grid Grid, xs objects.ObjectMap) *World {
 	return &World{
-		grid:    grid,
-		objects: objs,
+		grid:      grid,
+		objects:   xs,
+		objectMap: objectsToMap(xs),
 	}
 }
 
@@ -94,24 +99,19 @@ func (w *World) GetObjects(key objects.WorldObjectKey) []objects.WorldObject {
 	return w.objects[key]
 }
 
-func (w *World) GetObjectsAtLocation(loc location.Location) []objects.WorldObject {
-	// TODO: This should really be precomputed. Also not sure if it should be part of this struct
-	var result []objects.WorldObject
-	keys := []objects.WorldObjectKey{
-		objects.AGENT,
-		objects.BOX,
-		objects.GOAL,
-	}
-
-	for _, key := range keys {
-		for _, obj := range w.GetObjects(key) {
-			if obj.GetLocation() == loc {
-				result = append(result, obj)
-			}
+func (w *World) MoveObject(o objects.WorldObject, newLoc location.Location) {
+	for i, v := range w.objectMap[o.GetLocation()] {
+		if v == o {
+			utils.Remove(w.objectMap[o.GetLocation()], i)
 		}
 	}
 
-	return result
+	w.objectMap[newLoc] = append(w.objectMap[newLoc], o)
+	o.SetLocation(newLoc)
+}
+
+func (w *World) GetObjectsAtLocation(loc location.Location) []objects.WorldObject {
+	return w.objectMap[loc]
 }
 
 // Stringify
@@ -198,6 +198,17 @@ func (w *World) lowerRightCorner() location.Location {
 		}
 		if result.Y < key.Y {
 			result.Y = key.Y
+		}
+	}
+
+	return result
+}
+
+func objectsToMap(values objects.ObjectMap) WorldObjectMap {
+	result := make(WorldObjectMap)
+	for _, vs := range values {
+		for _, o := range vs {
+			result[o.GetLocation()] = append(result[o.GetLocation()], o)
 		}
 	}
 

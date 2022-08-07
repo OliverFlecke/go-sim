@@ -6,6 +6,7 @@ import (
 
 type WorldObject interface {
 	GetLocation() location.Location
+	SetLocation(location.Location)
 	GetRune() rune
 }
 

@@ -9,11 +9,15 @@ type Goal struct {
 
 // IMPL: WorldObject interface
 
-func (g Goal) GetLocation() location.Location {
+func (g *Goal) GetLocation() location.Location {
 	return g.location
 }
 
-func (g Goal) GetRune() rune {
+func (g *Goal) SetLocation(l location.Location) {
+	g.location = l
+}
+
+func (g *Goal) GetRune() rune {
 	return g.goalType
 }
 

@@ -28,9 +28,13 @@ func NewAgentWithStartLocation(name string, callsign rune, start location.Locati
 	}
 }
 
-// Implements WorldObject interface
+// IMPL: WorldObject interface
 func (a *Agent) GetLocation() location.Location {
 	return a.location
+}
+
+func (a *Agent) SetLocation(l location.Location) {
+	a.location = l
 }
 
 func (a *Agent) GetRune() rune {
@@ -38,8 +42,8 @@ func (a *Agent) GetRune() rune {
 }
 
 // Movement functions
-func (agent *Agent) move(dir direction.Direction) {
-	agent.location = agent.location.MoveInDirection(dir)
+func (a *Agent) move(dir direction.Direction) {
+	a.SetLocation(a.location.MoveInDirection(dir))
 }
 
 func (agent *Agent) MoveInWorld(world IWorld, dir direction.Direction) bool {

@@ -12,11 +12,15 @@ type Box struct {
 
 // IMPL: WorldObject interface
 
-func (b Box) GetLocation() location.Location {
+func (b *Box) GetLocation() location.Location {
 	return b.location
 }
 
-func (b Box) GetRune() rune {
+func (b *Box) SetLocation(l location.Location) {
+	b.location = l
+}
+
+func (b *Box) GetRune() rune {
 	return b.boxType
 }
 

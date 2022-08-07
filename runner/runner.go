@@ -36,7 +36,7 @@ func main() {
 	for {
 		goal := getGoal(world, goalId)
 		if goal == nil {
-			fmt.Printf("\nNo more goals to solve. Closing simulator")
+			fmt.Printf("\nNo more goals to solve. Stopping simulator")
 			return
 		}
 
