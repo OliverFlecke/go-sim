@@ -11,6 +11,7 @@ type IWorld interface {
 	GetLocation(location.Location) GridType
 	GetNeighbors(location.Location) []location.Location
 	GetObjects(objects.WorldObjectKey) []objects.WorldObject
+	GetObjectsAtLocation(location.Location) []objects.WorldObject
 
 	ToStringWithObjects() string
 }
@@ -91,6 +92,26 @@ func (world *World) GetNeighbors(loc location.Location) []location.Location {
 
 func (w *World) GetObjects(key objects.WorldObjectKey) []objects.WorldObject {
 	return w.objects[key]
+}
+
+func (w *World) GetObjectsAtLocation(loc location.Location) []objects.WorldObject {
+	// TODO: This should really be precomputed. Also not sure if it should be part of this struct
+	var result []objects.WorldObject
+	keys := []objects.WorldObjectKey{
+		objects.AGENT,
+		objects.BOX,
+		objects.GOAL,
+	}
+
+	for _, key := range keys {
+		for _, obj := range w.GetObjects(key) {
+			if obj.GetLocation() == loc {
+				result = append(result, obj)
+			}
+		}
+	}
+
+	return result
 }
 
 // Stringify

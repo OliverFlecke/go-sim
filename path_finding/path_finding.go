@@ -19,6 +19,44 @@ type SearchStats struct {
 	visited int
 }
 
+/*
+Find a location that satisfies the given predicate.
+Uses BFS to find the nearest location.
+*/
+func FindLocation(
+	world sim.IWorld,
+	start location.Location,
+	predicate func(location.Location) bool) (*location.Location, error) {
+
+	visited := mapset.NewSet[location.Location]()
+	visited.Add(start)
+	queue := prque.New(nil)
+	queue.Push(Cell{location: start}, 0)
+
+	for !queue.Empty() {
+		current, _ := queue.Pop()
+		cell := current.(Cell)
+
+		if predicate(cell.location) {
+			return &cell.location, nil
+		}
+
+		for _, neighbor := range world.GetNeighbors(cell.location) {
+			if !visited.Contains(neighbor) {
+				visited.Add(neighbor)
+				queue.Push(Cell{
+					location: neighbor,
+					depth:    cell.depth + 1,
+					previous: &cell,
+				},
+					-(cell.depth + 1))
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("no location found satisfying predicate")
+}
+
 func FindPath(
 	world sim.IWorld,
 	start location.Location,

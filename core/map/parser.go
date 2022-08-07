@@ -72,6 +72,7 @@ func parseObjects(str string) (objects.ObjectMap, error) {
 				agent := sim.NewAgentWithStartLocation("unused", id, loc)
 				result[objects.AGENT] = append(result[objects.AGENT], agent)
 			case "box":
+				fmt.Print("Creating box\n")
 				box := objects.NewBox(loc, id)
 				result[objects.BOX] = append(result[objects.BOX], box)
 			case "goal":
