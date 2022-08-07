@@ -46,6 +46,10 @@ func main() {
 			fmt.Println(err)
 			return
 		}
+		if box == nil {
+			fmt.Println("No box found")
+			return
+		}
 
 		p, _, err := pathfinding.FindPath(
 			world,
@@ -82,7 +86,6 @@ func main() {
 			fmt.Printf("\n\nWorld at %s\n", t)
 			fmt.Print(world.ToStringWithObjects())
 		}
-		// fmt.Print("\nCompleted\n")
 		goalId += 1
 	}
 }
@@ -101,16 +104,25 @@ func findBox(
 	start location.Location,
 	goal objects.Goal) (*objects.Box, error) {
 	obj, err := pathfinding.FindLocation(world, start, func(l location.Location) objects.WorldObject {
+		var box *objects.Box = nil
+		var otherGoal objects.WorldObject
+
 		for _, obj := range world.GetObjectsAtLocation(l) {
 			switch v := obj.(type) {
 			case *objects.Box:
 				if unicode.ToLower(v.GetType()) == goal.GetRune() {
-					return obj
+					box = v
 				}
+			case *objects.Goal:
+				otherGoal = v
 			}
 		}
 
-		return nil
+		if box == nil || (otherGoal != nil && unicode.ToLower(box.GetType()) == goal.GetRune()) {
+			return nil
+		}
+
+		return box
 	})
 
 	if err != nil {
