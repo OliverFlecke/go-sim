@@ -1,7 +1,6 @@
 package objects
 
 import (
-	"simulator/core/direction"
 	"simulator/core/location"
 )
 
@@ -36,8 +35,4 @@ func NewBox(location location.Location, boxType rune) *Box {
 
 func (b Box) GetType() rune {
 	return b.boxType
-}
-
-func (b *Box) MoveInDirection(dir direction.Direction) {
-	b.location = b.location.MoveInDirection(dir)
 }

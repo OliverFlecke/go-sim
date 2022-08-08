@@ -102,7 +102,7 @@ func (w *World) GetObjects(key objects.WorldObjectKey) []objects.WorldObject {
 func (w *World) MoveObject(o objects.WorldObject, newLoc location.Location) {
 	for i, v := range w.objectMap[o.GetLocation()] {
 		if v == o {
-			utils.Remove(w.objectMap[o.GetLocation()], i)
+			w.objectMap[o.GetLocation()] = utils.Remove(w.objectMap[o.GetLocation()], i)
 		}
 	}
 

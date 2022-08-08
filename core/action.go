@@ -1,7 +1,9 @@
 package simulator
 
 import (
+	"fmt"
 	"simulator/core/direction"
+	"simulator/core/location"
 	"simulator/core/objects"
 )
 
@@ -39,7 +41,26 @@ func NewActionMoveWithBox(
 	}
 }
 
+func isValidMoveWithBox(newL location.Location, w *IWorld) error {
+	for _, v := range (*w).GetObjectsAtLocation(newL) {
+		switch o := v.(type) {
+		case *objects.Box:
+			return fmt.Errorf("a box is already at loc (%v): %v", newL, o)
+		case *Agent:
+			return fmt.Errorf("an agent is already at loc (%v): %v", newL, o)
+		}
+	}
+
+	return nil
+}
+
 func (action MoveWithBoxAction) Perform(a *Agent, w *IWorld) {
+	err := isValidMoveWithBox(a.GetLocation().MoveInDirection(action.dir), w)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	a.MoveInWorld(*w, action.dir)
 	(*w).MoveObject(action.box, action.box.GetLocation().MoveInDirection(action.dir))
 }

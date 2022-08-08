@@ -5,6 +5,7 @@ import (
 	sim "simulator/core"
 	"simulator/core/location"
 	"simulator/core/objects"
+	"simulator/core/utils"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	prque "github.com/ethereum/go-ethereum/common/prque"
@@ -59,11 +60,14 @@ func FindLocation(
 	return nil, fmt.Errorf("no location found satisfying predicate")
 }
 
+type filter func(location.Location, sim.IWorld) bool
+
 func FindPath(
 	world sim.IWorld,
 	start location.Location,
 	goal location.Location,
-	heuristic heuristic) ([]location.Location, SearchStats, error) {
+	heuristic heuristic,
+	filter filter) ([]location.Location, SearchStats, error) {
 
 	visited := mapset.NewSet[location.Location]()
 	visited.Add(start)
@@ -75,6 +79,7 @@ func FindPath(
 
 	for {
 		if queue.Empty() {
+			fmt.Printf("States visited %v\n", visited)
 			err = fmt.Errorf("no path found between from %v to %v", start, goal)
 			break
 		}
@@ -87,7 +92,16 @@ func FindPath(
 			break
 		}
 
-		for _, neighbor := range world.GetNeighbors(cell.location) {
+		neighbors := utils.Filteri(world.GetNeighbors(cell.location),
+			func(_ int, l location.Location) bool {
+				if filter == nil {
+					return true
+				}
+
+				return filter(l, world)
+			})
+
+		for _, neighbor := range neighbors {
 			if !visited.Contains(neighbor) {
 				visited.Add(neighbor)
 				queue.Push(Cell{

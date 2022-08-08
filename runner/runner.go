@@ -15,9 +15,20 @@ import (
 	"unicode"
 )
 
+const defaultSpeed time.Duration = 250 * time.Millisecond
+
 func main() {
 	fmt.Println("Starting simulation...")
 	mapName := os.Args[1]
+	var speed = defaultSpeed
+	var err error
+	if len(os.Args) > 2 {
+		speed, err = time.ParseDuration(os.Args[2])
+		if err != nil {
+			fmt.Printf("Time must be an integer. Error: %s", err)
+			return
+		}
+	}
 	world, err := maps.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
@@ -28,7 +39,7 @@ func main() {
 	fmt.Println()
 
 	opt := simulator.SimulationOptions{}
-	opt.SetTickDuration(250 * time.Millisecond)
+	opt.SetTickDuration(speed)
 	sim := simulator.NewSimulation(world, []simulator.Agent{*agent}, opt)
 
 	goalId := 0
@@ -40,7 +51,7 @@ func main() {
 			return
 		}
 
-		fmt.Printf("Got goal %v\n", goal)
+		fmt.Printf("\nSolving goal %v\n", goal)
 		box, err := findBox(world, agent.GetLocation(), *goal)
 		if err != nil {
 			fmt.Println(err)
@@ -55,7 +66,8 @@ func main() {
 			world,
 			agent.GetLocation(),
 			box.GetLocation(),
-			pathfinding.AStar)
+			pathfinding.AStar,
+			nil)
 		if err != nil {
 			fmt.Printf("Error: %s\n", err.Error())
 			continue
@@ -68,7 +80,17 @@ func main() {
 			world,
 			box.GetLocation(),
 			goal.GetLocation(),
-			pathfinding.AStar)
+			pathfinding.AStar,
+			func(l location.Location, w simulator.IWorld) bool {
+				for _, o := range w.GetObjectsAtLocation(l) {
+					switch o.(type) {
+					case *objects.Box:
+						return false
+					}
+				}
+
+				return true
+			})
 		if err != nil {
 			fmt.Printf("Unable to find path from box to goal. Error: %s\n", err.Error())
 			return
