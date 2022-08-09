@@ -3,6 +3,7 @@ package simulationMap
 import (
 	"reflect"
 	sim "simulator/core"
+	"simulator/core/agent"
 	"simulator/core/location"
 	"simulator/core/objects"
 	"testing"
@@ -30,7 +31,7 @@ func TestPaseMapFile(t *testing.T) {
 
 	objs := make(objects.ObjectMap)
 	objs[objects.AGENT] = []objects.WorldObject{
-		sim.NewAgentWithStartLocation("unused", '0', location.New(1, 1)),
+		agent.NewAgentWithStartLocation("unused", '0', location.New(1, 1)),
 	}
 	objs[objects.BOX] = []objects.WorldObject{
 		objects.NewBox(location.New(2, 2), 'A'),

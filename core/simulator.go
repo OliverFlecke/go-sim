@@ -2,26 +2,25 @@ package simulator
 
 import (
 	"fmt"
+	"simulator/core/agent"
 	"time"
 )
 
 type Simulation struct {
 	world   IWorld
 	options SimulationOptions
-	agents  []Agent
-	actions map[*Agent][]Action
+	actions map[*agent.Agent][]Action
 }
 
-func NewSimulation(world IWorld, agents []Agent, options SimulationOptions) *Simulation {
+func NewSimulation(world IWorld, options SimulationOptions) *Simulation {
 	return &Simulation{
 		world:   world,
-		agents:  agents,
 		options: options,
-		actions: make(map[*Agent][]Action),
+		actions: make(map[*agent.Agent][]Action),
 	}
 }
 
-func (s *Simulation) SetActions(agent *Agent, actions []Action) {
+func (s *Simulation) SetActions(agent *agent.Agent, actions []Action) {
 	s.actions[agent] = append(s.actions[agent], actions...)
 }
 

@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"simulator/core/agent"
 	"simulator/core/location"
 	"testing"
 )
@@ -26,8 +27,8 @@ func TestToString(t *testing.T) {
 
 func TestToStringWithAgents(t *testing.T) {
 	world := NewGridWorld(3)
-	agents := []Agent{
-		*NewAgentWithStartLocation("Test agent", '0', location.New(2, 2)),
+	agents := []agent.Agent{
+		*agent.NewAgentWithStartLocation("Test agent", '0', location.New(2, 2)),
 	}
 	expected := "#####\n#   #\n# 0 #\n#   #\n#####"
 

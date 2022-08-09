@@ -1,6 +1,7 @@
 package simulator
 
 import (
+	"simulator/core/agent"
 	dir "simulator/core/direction"
 	"simulator/core/location"
 	"simulator/core/objects"
@@ -122,16 +123,16 @@ func (w *World) ToString() string {
 	})
 }
 
-func (w *World) ToStringWithAgents(agents []Agent) string {
-	lookup := make(map[location.Location]Agent)
+func (w *World) ToStringWithAgents(agents []agent.Agent) string {
+	lookup := make(map[location.Location]agent.Agent)
 	for _, agent := range agents {
-		lookup[agent.location] = agent
+		lookup[agent.GetLocation()] = agent
 	}
 
 	return w.toStringHelper(func(l location.Location) rune {
 		agent, found := lookup[l]
 		if found {
-			return agent.callsign
+			return agent.GetRune()
 		} else {
 			return ToRune(w.GetLocation(l))
 		}

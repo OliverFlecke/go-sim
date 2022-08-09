@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	simulator "simulator/core"
+	"simulator/core/agent"
 	"simulator/core/direction"
 	"simulator/core/location"
 	maps "simulator/core/map"
@@ -34,13 +35,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	agent := world.GetObjects(objects.AGENT)[0].(*simulator.Agent)
+	a := world.GetObjects(objects.AGENT)[0].(*agent.Agent)
 	fmt.Print(world.ToStringWithObjects())
 	fmt.Println()
 
 	opt := simulator.SimulationOptions{}
 	opt.SetTickDuration(speed)
-	sim := simulator.NewSimulation(world, []simulator.Agent{*agent}, opt)
+	sim := simulator.NewSimulation(world, opt)
 
 	goalId := 0
 
@@ -52,7 +53,7 @@ func main() {
 		}
 
 		fmt.Printf("\nSolving goal %v\n", goal)
-		box, err := findBox(world, agent.GetLocation(), *goal)
+		box, err := findBox(world, a.GetLocation(), *goal)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -64,7 +65,7 @@ func main() {
 
 		p, _, err := pathfinding.FindPath(
 			world,
-			agent.GetLocation(),
+			a.GetLocation(),
 			box.GetLocation(),
 			pathfinding.AStar,
 			nil)
@@ -100,7 +101,7 @@ func main() {
 				return simulator.NewActionMoveWithBox(dir, box)
 			})...)
 
-		sim.SetActions(agent, actions)
+		sim.SetActions(a, actions)
 		quit := make(chan bool)
 		ticker := sim.Run(quit)
 

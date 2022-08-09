@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"regexp"
 	sim "simulator/core"
+	"simulator/core/agent"
 	"simulator/core/location"
 	"simulator/core/objects"
 	"strconv"
@@ -69,7 +70,7 @@ func parseObjects(str string) (objects.ObjectMap, error) {
 
 			switch match[typeIdx] {
 			case "agent":
-				agent := sim.NewAgentWithStartLocation("unused", id, loc)
+				agent := agent.NewAgentWithStartLocation("unused", id, loc)
 				result[objects.AGENT] = append(result[objects.AGENT], agent)
 			case "box":
 				box := objects.NewBox(loc, id)
