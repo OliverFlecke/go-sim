@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	simulator "simulator/core"
+	"simulator/core/action"
 	"simulator/core/agent"
 	"simulator/core/direction"
 	"simulator/core/location"
@@ -75,8 +76,8 @@ func main() {
 			continue
 		}
 
-		actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) simulator.Action {
-			return simulator.NewActionMove(dir)
+		actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) action.Action {
+			return action.NewActionMove(dir)
 		})
 		p, _, err = pathfinding.FindPath(
 			w,
@@ -98,8 +99,8 @@ func main() {
 			return
 		}
 		actions = append(actions, utils.Mapi(location.PathToDirections(p),
-			func(_ int, dir direction.Direction) simulator.Action {
-				return simulator.NewActionMoveWithBox(dir, box)
+			func(_ int, dir direction.Direction) action.Action {
+				return action.NewActionMoveWithBox(dir, box)
 			})...)
 
 		sim.SetActions(a, actions)
