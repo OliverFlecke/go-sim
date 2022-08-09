@@ -13,7 +13,7 @@ import (
 	"simulator/core/objects"
 	"simulator/core/utils"
 	"simulator/core/world"
-	pathfinding "simulator/path_finding"
+	"simulator/pathfinding"
 	"time"
 	"unicode"
 )
