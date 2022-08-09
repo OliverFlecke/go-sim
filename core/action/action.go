@@ -6,5 +6,19 @@ import (
 )
 
 type Action interface {
-	Perform(*agent.Agent, world.IWorld)
+	Perform(*agent.Agent, world.IWorld) ActionResult
+}
+
+type ActionResult struct {
+	Err error
+}
+
+func success() ActionResult {
+	return ActionResult{}
+}
+
+func failure(err error) ActionResult {
+	return ActionResult{
+		Err: err,
+	}
 }

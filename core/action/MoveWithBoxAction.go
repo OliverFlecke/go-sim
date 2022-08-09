@@ -41,14 +41,15 @@ func isValidMoveWithBox(w world.IWorld, newL location.Location) error {
 	return nil
 }
 
-func (action MoveWithBoxAction) Perform(a *agent.Agent, w world.IWorld) {
+func (action MoveWithBoxAction) Perform(a *agent.Agent, w world.IWorld) ActionResult {
 	newLoc := a.GetLocation().MoveInDirection(action.dir)
 	err := isValidMoveWithBox(w, newLoc)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return failure(err)
 	}
 
 	w.MoveObject(a, newLoc)
 	w.MoveObject(action.box, newLoc)
+
+	return success()
 }
