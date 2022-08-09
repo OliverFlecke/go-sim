@@ -1,13 +1,13 @@
 package pathfinding
 
 import (
-	sim "simulator/core"
 	"simulator/core/location"
+	"simulator/core/world"
 	"testing"
 )
 
 func TestFindPath(t *testing.T) {
-	world := sim.NewGridWorld(4)
+	world := world.NewGridWorld(4)
 	start := location.Location{}
 	goal := location.New(2, 2)
 
@@ -27,7 +27,7 @@ func TestFindPath(t *testing.T) {
 }
 
 func TestFindPathWithAStar(t *testing.T) {
-	world := sim.NewGridWorld(10)
+	world := world.NewGridWorld(10)
 	start := location.Location{}
 	goal := location.New(9, 9)
 

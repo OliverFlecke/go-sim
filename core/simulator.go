@@ -3,16 +3,17 @@ package simulator
 import (
 	"fmt"
 	"simulator/core/agent"
+	"simulator/core/world"
 	"time"
 )
 
 type Simulation struct {
-	world   IWorld
+	world   world.IWorld
 	options SimulationOptions
 	actions map[*agent.Agent][]Action
 }
 
-func NewSimulation(world IWorld, options SimulationOptions) *Simulation {
+func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
 	return &Simulation{
 		world:   world,
 		options: options,

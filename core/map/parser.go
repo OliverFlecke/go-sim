@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"regexp"
-	sim "simulator/core"
 	"simulator/core/agent"
 	"simulator/core/location"
 	"simulator/core/objects"
+	"simulator/core/world"
 	"strconv"
 	"strings"
 )
 
-func parseGridWorld(text string) sim.Grid {
-	grid := make(sim.Grid)
+func parseGridWorld(text string) world.Grid {
+	grid := make(world.Grid)
 	var x, y int
 
 	for _, c := range text {
@@ -23,9 +23,9 @@ func parseGridWorld(text string) sim.Grid {
 			y += 1
 			x = -1
 		case ' ':
-			grid[loc] = sim.EMPTY
+			grid[loc] = world.EMPTY
 		case '#':
-			grid[loc] = sim.WALL
+			grid[loc] = world.WALL
 		}
 		x += 1
 	}
@@ -87,7 +87,7 @@ func parseObjects(str string) (objects.ObjectMap, error) {
 	return result, nil
 }
 
-func parseWorldFromString(content string) (sim.IWorld, error) {
+func parseWorldFromString(content string) (world.IWorld, error) {
 	splits := strings.Split(content, "\n\n")
 
 	grid := parseGridWorld(splits[0])
@@ -97,13 +97,13 @@ func parseWorldFromString(content string) (sim.IWorld, error) {
 			return nil, err
 		}
 
-		return sim.NewWorld(grid, objs), nil
+		return world.NewWorld(grid, objs), nil
 	}
 
-	return sim.NewWorld(grid, make(objects.ObjectMap)), nil
+	return world.NewWorld(grid, make(objects.ObjectMap)), nil
 }
 
-func ParseWorldFromFile(filename string) (sim.IWorld, error) {
+func ParseWorldFromFile(filename string) (world.IWorld, error) {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err

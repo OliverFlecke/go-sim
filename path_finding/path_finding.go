@@ -2,10 +2,10 @@ package pathfinding
 
 import (
 	"fmt"
-	sim "simulator/core"
 	"simulator/core/location"
 	"simulator/core/objects"
 	"simulator/core/utils"
+	"simulator/core/world"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	prque "github.com/ethereum/go-ethereum/common/prque"
@@ -26,7 +26,7 @@ Find a location that satisfies the given predicate.
 Uses BFS to find the nearest location.
 */
 func FindLocation(
-	world sim.IWorld,
+	world world.IWorld,
 	start location.Location,
 	predicate func(location.Location) objects.WorldObject) (objects.WorldObject, error) {
 
@@ -61,7 +61,7 @@ func FindLocation(
 }
 
 func FindPath(
-	world sim.IWorld,
+	world world.IWorld,
 	start location.Location,
 	goal location.Location,
 	heuristic heuristic,

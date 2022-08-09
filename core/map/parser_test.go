@@ -2,27 +2,27 @@ package simulationMap
 
 import (
 	"reflect"
-	sim "simulator/core"
 	"simulator/core/agent"
 	"simulator/core/location"
 	"simulator/core/objects"
+	"simulator/core/world"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseStringToMap(t *testing.T) {
-	w, err := ParseWorldFromFile("../../maps/00.map")
-	world := w.(*sim.World)
-	expected := sim.NewGridWorld(2)
+	wp, err := ParseWorldFromFile("../../maps/00.map")
+	w := wp.(*world.World)
+	expected := world.NewGridWorld(2)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(world.GetMap(), expected.GetMap()) {
+	if !reflect.DeepEqual(w.GetMap(), expected.GetMap()) {
 		t.Fatalf("Parsed world does not match. Expected:\n%v\nActual:\n%v. Maps: Expected:\n%v\nActual:\n%v",
-			expected.ToString(), world.ToString(), expected.GetMap(), world.GetMap())
+			expected.ToString(), w.ToString(), expected.GetMap(), w.GetMap())
 	}
 }
 
@@ -39,7 +39,7 @@ func TestPaseMapFile(t *testing.T) {
 	objs[objects.GOAL] = []objects.WorldObject{
 		objects.NewGoal(location.New(3, 3), 'a'),
 	}
-	expected := sim.NewWorld(sim.NewGrid(3), objs)
+	expected := world.NewWorld(world.NewGrid(3), objs)
 
 	if err != nil {
 		t.Fatal(err)

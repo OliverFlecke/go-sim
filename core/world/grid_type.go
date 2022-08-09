@@ -1,4 +1,4 @@
-package simulator
+package world
 
 type GridType = byte
 

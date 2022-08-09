@@ -1,8 +1,8 @@
 package pathfinding
 
 import (
-	sim "simulator/core"
 	"simulator/core/location"
+	"simulator/core/world"
 )
 
-type filter func(location.Location, sim.IWorld) bool
+type filter func(location.Location, world.IWorld) bool

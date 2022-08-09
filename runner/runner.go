@@ -11,6 +11,7 @@ import (
 	maps "simulator/core/map"
 	"simulator/core/objects"
 	"simulator/core/utils"
+	"simulator/core/world"
 	pathfinding "simulator/path_finding"
 	"time"
 	"unicode"
@@ -30,30 +31,30 @@ func main() {
 			return
 		}
 	}
-	world, err := maps.ParseWorldFromFile(mapName)
+	w, err := maps.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	a := world.GetObjects(objects.AGENT)[0].(*agent.Agent)
-	fmt.Print(world.ToStringWithObjects())
+	a := w.GetObjects(objects.AGENT)[0].(*agent.Agent)
+	fmt.Print(w.ToStringWithObjects())
 	fmt.Println()
 
 	opt := simulator.SimulationOptions{}
 	opt.SetTickDuration(speed)
-	sim := simulator.NewSimulation(world, opt)
+	sim := simulator.NewSimulation(w, opt)
 
 	goalId := 0
 
 	for {
-		goal := getGoal(world, goalId)
+		goal := getGoal(w, goalId)
 		if goal == nil {
 			fmt.Printf("\nNo more goals to solve. Stopping simulator")
 			return
 		}
 
 		fmt.Printf("\nSolving goal %v\n", goal)
-		box, err := findBox(world, a.GetLocation(), *goal)
+		box, err := findBox(w, a.GetLocation(), *goal)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -64,7 +65,7 @@ func main() {
 		}
 
 		p, _, err := pathfinding.FindPath(
-			world,
+			w,
 			a.GetLocation(),
 			box.GetLocation(),
 			pathfinding.AStar,
@@ -78,11 +79,11 @@ func main() {
 			return simulator.NewActionMove(dir)
 		})
 		p, _, err = pathfinding.FindPath(
-			world,
+			w,
 			box.GetLocation(),
 			goal.GetLocation(),
 			pathfinding.AStar,
-			func(l location.Location, w simulator.IWorld) bool {
+			func(l location.Location, w world.IWorld) bool {
 				for _, o := range w.GetObjectsAtLocation(l) {
 					switch o.(type) {
 					case *objects.Box:
@@ -107,13 +108,13 @@ func main() {
 
 		for t := range ticker {
 			fmt.Printf("\n\nWorld at %s\n", t)
-			fmt.Print(world.ToStringWithObjects())
+			fmt.Print(w.ToStringWithObjects())
 		}
 		goalId += 1
 	}
 }
 
-func getGoal(w simulator.IWorld, i int) *objects.Goal {
+func getGoal(w world.IWorld, i int) *objects.Goal {
 	goals := w.GetObjects(objects.GOAL)
 	if len(goals) > i {
 		return goals[i].(*objects.Goal)
@@ -123,14 +124,14 @@ func getGoal(w simulator.IWorld, i int) *objects.Goal {
 }
 
 func findBox(
-	world simulator.IWorld,
+	w world.IWorld,
 	start location.Location,
 	goal objects.Goal) (*objects.Box, error) {
-	obj, err := pathfinding.FindLocation(world, start, func(l location.Location) objects.WorldObject {
+	obj, err := pathfinding.FindLocation(w, start, func(l location.Location) objects.WorldObject {
 		var box *objects.Box = nil
 		var otherGoal objects.WorldObject
 
-		for _, obj := range world.GetObjectsAtLocation(l) {
+		for _, obj := range w.GetObjectsAtLocation(l) {
 			switch v := obj.(type) {
 			case *objects.Box:
 				if unicode.ToLower(v.GetType()) == goal.GetRune() {

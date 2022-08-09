@@ -1,4 +1,4 @@
-package simulator
+package world
 
 import (
 	"simulator/core/agent"

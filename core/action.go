@@ -6,10 +6,11 @@ import (
 	"simulator/core/direction"
 	"simulator/core/location"
 	"simulator/core/objects"
+	"simulator/core/world"
 )
 
 type Action interface {
-	Perform(*agent.Agent, *IWorld)
+	Perform(*agent.Agent, *world.IWorld)
 }
 
 // MoveAction action
@@ -23,12 +24,12 @@ func NewActionMove(dir direction.Direction) *MoveAction {
 	}
 }
 
-func isValidMove(world IWorld, agent *agent.Agent, dir direction.Direction) bool {
+func isValidMove(w world.IWorld, agent *agent.Agent, dir direction.Direction) bool {
 	newLocation := agent.GetLocation().MoveInDirection(dir)
-	return world.GetLocation(newLocation) == EMPTY
+	return w.GetLocation(newLocation) == world.EMPTY
 }
 
-func (m MoveAction) Perform(a *agent.Agent, w *IWorld) {
+func (m MoveAction) Perform(a *agent.Agent, w *world.IWorld) {
 	if !isValidMove(*w, a, m.dir) {
 		return
 	}
@@ -50,7 +51,7 @@ func NewActionMoveWithBox(
 	}
 }
 
-func isValidMoveWithBox(newL location.Location, w *IWorld) error {
+func isValidMoveWithBox(newL location.Location, w *world.IWorld) error {
 	for _, v := range (*w).GetObjectsAtLocation(newL) {
 		switch o := v.(type) {
 		case *objects.Box:
@@ -63,7 +64,7 @@ func isValidMoveWithBox(newL location.Location, w *IWorld) error {
 	return nil
 }
 
-func (action MoveWithBoxAction) Perform(a *agent.Agent, w *IWorld) {
+func (action MoveWithBoxAction) Perform(a *agent.Agent, w *world.IWorld) {
 	err := isValidMoveWithBox(a.GetLocation().MoveInDirection(action.dir), w)
 	if err != nil {
 		fmt.Println(err)
