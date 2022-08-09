@@ -77,7 +77,7 @@ func main() {
 		}
 
 		actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) action.Action {
-			return action.NewActionMove(dir)
+			return action.NewMove(dir)
 		})
 		p, _, err = pathfinding.FindPath(
 			w,
@@ -100,7 +100,7 @@ func main() {
 		}
 		actions = append(actions, utils.Mapi(location.PathToDirections(p),
 			func(_ int, dir direction.Direction) action.Action {
-				return action.NewActionMoveWithBox(dir, box)
+				return action.NewMoveWithBox(dir, box)
 			})...)
 
 		sim.SetActions(a, actions)

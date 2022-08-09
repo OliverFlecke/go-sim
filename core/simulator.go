@@ -72,7 +72,7 @@ func (s *Simulation) internalRun() bool {
 		if len(actions) > 0 {
 			action := actions[0]
 			// fmt.Printf("\nAgent %c performing action %v\n", agent.callsign, reflect.TypeOf(action))
-			action.Perform(agent, &s.world)
+			action.Perform(agent, s.world)
 			s.actions[agent] = actions[1:]
 			finished = finished && len(s.actions[agent]) == 0
 		}
