@@ -60,8 +60,6 @@ func FindLocation(
 	return nil, fmt.Errorf("no location found satisfying predicate")
 }
 
-type filter func(location.Location, sim.IWorld) bool
-
 func FindPath(
 	world sim.IWorld,
 	start location.Location,

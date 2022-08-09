@@ -13,14 +13,14 @@ func AssertEqual(t *testing.T, a interface{}, b interface{}) {
 	}
 }
 
-func AssertEqualSlices[T comparable](t *testing.T, a []T, b []T) {
-	if len(a) != len(b) {
-		t.Fatalf("Slices has different length. a: %d, b: %d", len(a), len(b))
+func AssertEqualSlices[T comparable](t *testing.T, actual []T, expected []T) {
+	if len(actual) != len(expected) {
+		t.Fatalf("Slices has different length. a: %d, b: %d", len(actual), len(expected))
 	}
 
-	for i := 0; i < len(a); i++ {
-		if a[i] != b[i] {
-			t.Fatalf("Item at %d does not match. a: %v, b: %v", i, a[i], b[i])
+	for i := 0; i < len(actual); i++ {
+		if actual[i] != expected[i] {
+			t.Fatalf("Item at %d does not match. a: %v, b: %v", i, actual[i], expected[i])
 		}
 	}
 }

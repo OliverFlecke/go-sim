@@ -37,7 +37,9 @@ func (loc Location) ManhattanDistance(other Location) int {
 }
 
 func (loc Location) DirectDistance(other Location) float64 {
-	return math.Sqrt(math.Pow(float64(loc.X), 2) + math.Pow(float64(loc.Y), 2))
+	return math.Sqrt(
+		math.Pow(float64(other.X-loc.X), 2) +
+			math.Pow(float64(other.Y-loc.Y), 2))
 }
 
 func Subtract(a, b Location) Location {

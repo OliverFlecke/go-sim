@@ -1,6 +1,7 @@
 package location
 
 import (
+	"math"
 	"simulator/core/direction"
 	"simulator/core/utils"
 	"testing"
@@ -56,6 +57,35 @@ func TestManhattanDistance(t *testing.T) {
 	}
 }
 
+type TestDirectDistanceData struct {
+	a        Location
+	b        Location
+	expected float64
+}
+
+func TestDirectDistance(t *testing.T) {
+	data := []TestDirectDistanceData{
+		{
+			a:        New(0, 0),
+			b:        New(2, 2),
+			expected: math.Sqrt(8),
+		},
+		{
+			a:        New(10, 10),
+			b:        New(20, 20),
+			expected: math.Sqrt(200),
+		},
+	}
+
+	for _, value := range data {
+		dist := value.a.DirectDistance(value.b)
+		if dist != value.expected {
+			t.Fatalf("Wrong distance. Expected %f, got %f",
+				value.expected, dist)
+		}
+	}
+}
+
 type TestSubtraction struct {
 	a        Location
 	b        Location
@@ -77,6 +107,12 @@ func TestSubstract(t *testing.T) {
 			t.Fatalf("Wrong value. Expected %d, got %d", value.expected, result)
 		}
 	}
+}
+
+func TestEmptyPathToDirections(t *testing.T) {
+	utils.AssertEqualSlices(t,
+		PathToDirections(make([]Location, 0)),
+		make([]direction.Direction, 0))
 }
 
 func TestPathToDirections(t *testing.T) {

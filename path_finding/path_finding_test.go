@@ -11,7 +11,7 @@ func TestFindPath(t *testing.T) {
 	start := location.Location{}
 	goal := location.New(2, 2)
 
-	path, stats, err := FindPath(world, start, goal, BFS)
+	path, stats, err := FindPath(world, start, goal, BFS, nil)
 
 	if err != nil {
 		t.Fatal(err.Error())
@@ -31,7 +31,7 @@ func TestFindPathWithAStar(t *testing.T) {
 	start := location.Location{}
 	goal := location.New(9, 9)
 
-	path, _, err := FindPath(world, start, goal, AStar)
+	path, _, err := FindPath(world, start, goal, AStar, nil)
 
 	if err != nil {
 		t.Fatal(err.Error())
