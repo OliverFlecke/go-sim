@@ -6,6 +6,8 @@ import (
 	"simulator/core/location"
 	"simulator/core/objects"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseStringToMap(t *testing.T) {
@@ -45,4 +47,25 @@ func TestPaseMapFile(t *testing.T) {
 	if !reflect.DeepEqual(w, expected) {
 		t.Fatalf("Parsed world does not match. Expected:\n%v\nActual:\n%v", expected, w)
 	}
+}
+
+// Error tests
+func TestParseWorldFromFileNotFound(t *testing.T) {
+	_, err := ParseWorldFromFile("non_existing_file")
+
+	assert.EqualError(t, err, "open non_existing_file: no such file or directory")
+}
+
+func TestParseInt(t *testing.T) {
+	v, err := parseInt("1234")
+	if err != nil {
+		t.Fatalf("Received unexpected error %v", err)
+	}
+
+	assert.Equal(t, 1234, v, "Parsed value should match")
+}
+
+func TestParseIntWithInvalidValue(t *testing.T) {
+	_, err := parseInt("random string")
+	assert.EqualError(t, err, `strconv.ParseInt: parsing "random string": invalid syntax`)
 }
