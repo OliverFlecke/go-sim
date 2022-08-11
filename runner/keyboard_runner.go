@@ -1,54 +1,84 @@
 package main
 
-// /* This file contains method for running the simulation
-//  * in your console and controlling agents with the
-//  * arrow keys
-//  */
+/* This file contains method for running the simulation
+ * in your console and controlling agents with the
+ * arrow keys
+ */
 
-// import (
-// 	"fmt"
-// 	sim "simulator/core"
-// 	"simulator/core/direction"
+import (
+	"fmt"
+	"log"
+	"os"
+	simulator "simulator/core"
+	"simulator/core/action"
+	"simulator/core/agent"
+	"simulator/core/direction"
+	maps "simulator/core/map"
+	"simulator/core/objects"
+	"simulator/core/world"
 
-// 	"atomicgo.dev/keyboard"
-// 	"atomicgo.dev/keyboard/keys"
-// )
+	"atomicgo.dev/keyboard"
+	"atomicgo.dev/keyboard/keys"
+)
 
-// func keyboardListener(world sim.IWorld, agent *sim.Agent) {
-// 	keyboard.Listen(func(key keys.Key) (stop bool, err error) {
-// 		if key.Code == keys.CtrlC {
-// 			return true, nil
-// 		}
+func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("Please provide path to map file")
+		return
+	}
+	mapName := os.Args[1]
+	var err error
+	w, err := maps.ParseWorldFromFile(mapName)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 		dir, found := keyToDirection(key)
-// 		if found {
-// 			clearScreen()
-// 			if !agent.MoveInWorld(world, dir) {
-// 				fmt.Println("Invalid move")
-// 			}
-// 			fmt.Print(world.ToStringWithAgents([]sim.Agent{*agent}))
-// 		}
+	fmt.Println("Starting simulation...")
+	a := w.GetObjects(objects.AGENT)[0].(*agent.Agent)
+	fmt.Print(w.ToStringWithObjects())
+	fmt.Println()
 
-// 		return false, nil
-// 	})
-// }
+	keyboardListener(w, a)
+}
 
-// func clearScreen() {
-// 	fmt.Println("\033[2J")
-// }
+func keyboardListener(w world.IWorld, a *agent.Agent) {
+	opt := simulator.SimulationOptions{}
+	sim := simulator.NewSimulation(w, opt)
 
-// func keyToDirection(key keys.Key) (direction.Direction, bool) {
-// 	switch key.Code {
-// 	case keys.Right:
-// 		return direction.EAST, true
-// 	case keys.Left:
-// 		return direction.WEST, true
-// 	case keys.Up:
-// 		return direction.SOUTH, true
-// 	case keys.Down:
-// 		return direction.NORTH, true
+	keyboard.Listen(func(key keys.Key) (stop bool, err error) {
+		if key.Code == keys.CtrlC {
+			return true, nil
+		}
 
-// 	default:
-// 		return 0, false
-// 	}
-// }
+		dir, found := keyToDirection(key)
+		if found {
+			clearScreen()
+			sim.SetActions(a, []action.Action{action.NewMove(dir)})
+			for range sim.Run(nil) {
+				fmt.Print(w.ToStringWithObjects())
+			}
+		}
+
+		return false, nil
+	})
+}
+
+func clearScreen() {
+	fmt.Println("\033[2J")
+}
+
+func keyToDirection(key keys.Key) (direction.Direction, bool) {
+	switch key.Code {
+	case keys.Right:
+		return direction.EAST, true
+	case keys.Left:
+		return direction.WEST, true
+	case keys.Up:
+		return direction.SOUTH, true
+	case keys.Down:
+		return direction.NORTH, true
+
+	default:
+		return 0, false
+	}
+}
