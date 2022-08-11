@@ -44,18 +44,39 @@ func main() {
 func keyboardListener(w world.IWorld, a *agent.Agent) {
 	opt := simulator.SimulationOptions{}
 	sim := simulator.NewSimulation(w, opt)
+	var box *objects.Box
 
 	keyboard.Listen(func(key keys.Key) (stop bool, err error) {
 		if key.Code == keys.CtrlC {
 			return true, nil
 		}
 
-		dir, found := keyToDirection(key)
-		if found {
-			clearScreen()
-			sim.SetActions(a, []action.Action{action.NewMove(dir)})
-			for range sim.Run(nil) {
-				fmt.Print(w.ToStringWithObjects())
+		switch key.String() {
+		case "p":
+			if box != nil {
+				box = nil
+			} else {
+				for _, x := range w.GetObjectsAtLocation(a.GetLocation()) {
+					switch o := x.(type) {
+					case *objects.Box:
+						box = o
+					}
+				}
+			}
+		default:
+			dir, found := keyToDirection(key)
+			if found {
+				clearScreen()
+				var act action.Action
+				if box != nil {
+					act = action.NewMoveWithBox(dir, box)
+				} else {
+					act = action.NewMove(dir)
+				}
+				sim.SetActions(a, []action.Action{act})
+				for range sim.Run(nil) {
+					fmt.Print(w.ToStringWithObjects())
+				}
 			}
 		}
 
