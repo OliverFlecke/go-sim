@@ -12,6 +12,7 @@ type Simulation struct {
 	world   world.IWorld
 	options SimulationOptions
 	actions map[*agent.Agent][]action.Action
+	ticks   uint64
 }
 
 func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
@@ -20,6 +21,10 @@ func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
 		options: options,
 		actions: make(map[*agent.Agent][]action.Action),
 	}
+}
+
+func (s *Simulation) GetTicks() uint64 {
+	return s.ticks
 }
 
 func (s *Simulation) SetActions(agent *agent.Agent, actions []action.Action) {
@@ -67,6 +72,7 @@ func (s *Simulation) Run(quit chan bool) <-chan time.Time {
 }
 
 func (s *Simulation) internalRun() bool {
+	s.ticks++
 	finished := true
 	for agent, actions := range s.actions {
 		if len(actions) > 0 {

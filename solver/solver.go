@@ -46,62 +46,20 @@ func main() {
 	sim := simulator.NewSimulation(w, opt)
 
 	goalId := 0
+	totalActions := 0
 
 	for {
 		goal := getGoal(w, goalId)
 		if goal == nil {
-			fmt.Printf("\nNo more goals to solve. Stopping simulator")
-			return
+			break
 		}
 
-		fmt.Printf("\nSolving goal %v\n", goal)
-		box, err := findBox(w, a.GetLocation(), *goal)
-		if err != nil {
-			fmt.Println(err)
+		actions := solveGoal(goal, w, a)
+		if actions == nil {
+			fmt.Printf("Unable to solve problem!")
 			return
 		}
-		if box == nil {
-			fmt.Println("No box found")
-			return
-		}
-
-		p, _, err := pathfinding.FindPath(
-			w,
-			a.GetLocation(),
-			box.GetLocation(),
-			pathfinding.AStar,
-			nil)
-		if err != nil {
-			fmt.Printf("Error: %s\n", err.Error())
-			continue
-		}
-
-		actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) action.Action {
-			return action.NewMove(dir)
-		})
-		p, _, err = pathfinding.FindPath(
-			w,
-			box.GetLocation(),
-			goal.GetLocation(),
-			pathfinding.AStar,
-			func(l location.Location, w world.IWorld) bool {
-				for _, o := range w.GetObjectsAtLocation(l) {
-					switch o.(type) {
-					case *objects.Box:
-						return false
-					}
-				}
-
-				return true
-			})
-		if err != nil {
-			fmt.Printf("Unable to find path from box to goal. Error: %s\n", err.Error())
-			return
-		}
-		actions = append(actions, utils.Mapi(location.PathToDirections(p),
-			func(_ int, dir direction.Direction) action.Action {
-				return action.NewMoveWithBox(dir, box)
-			})...)
+		totalActions += len(actions)
 
 		sim.SetActions(a, actions)
 		quit := make(chan bool)
@@ -113,6 +71,63 @@ func main() {
 		}
 		goalId += 1
 	}
+
+	fmt.Printf("Problem solved.\n")
+	fmt.Printf("Total actions:   %d\n", totalActions)
+	fmt.Printf("Simulation time: %d\n", sim.GetTicks())
+}
+
+func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) []action.Action {
+	// fmt.Printf("\nSolving goal %v\n", goal)
+	box, err := findBox(w, a.GetLocation(), *goal)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	if box == nil {
+		fmt.Println("No box found")
+		return nil
+	}
+
+	p, _, err := pathfinding.FindPath(
+		w,
+		a.GetLocation(),
+		box.GetLocation(),
+		pathfinding.AStar,
+		nil)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err.Error())
+		return nil
+	}
+
+	actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) action.Action {
+		return action.NewMove(dir)
+	})
+	p, _, err = pathfinding.FindPath(
+		w,
+		box.GetLocation(),
+		goal.GetLocation(),
+		pathfinding.AStar,
+		func(l location.Location, w world.IWorld) bool {
+			for _, o := range w.GetObjectsAtLocation(l) {
+				switch o.(type) {
+				case *objects.Box:
+					return false
+				}
+			}
+
+			return true
+		})
+	if err != nil {
+		fmt.Printf("Unable to find path from box to goal. Error: %s\n", err.Error())
+		return nil
+	}
+	actions = append(actions, utils.Mapi(location.PathToDirections(p),
+		func(_ int, dir direction.Direction) action.Action {
+			return action.NewMoveWithBox(dir, box)
+		})...)
+
+	return actions
 }
 
 func getGoal(w world.IWorld, i int) *objects.Goal {
