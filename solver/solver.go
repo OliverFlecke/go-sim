@@ -107,9 +107,9 @@ func main() {
 		quit := make(chan bool)
 		ticker := sim.Run(quit)
 
-		for t := range ticker {
-			fmt.Printf("\n\nWorld at %s\n", t)
-			fmt.Print(w.ToStringWithObjects())
+		for range ticker {
+			// fmt.Printf("\n\nWorld at %s\n", t)
+			// fmt.Print(w.ToStringWithObjects())
 		}
 		goalId += 1
 	}

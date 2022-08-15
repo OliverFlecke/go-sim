@@ -73,7 +73,7 @@ func (world *World) GetLocation(loc location.Location) GridType {
 	if found {
 		return result
 	} else {
-		return WALL
+		return EMPTY
 	}
 }
 

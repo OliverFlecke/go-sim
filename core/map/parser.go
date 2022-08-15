@@ -23,7 +23,8 @@ func parseGridWorld(text string) world.Grid {
 			y += 1
 			x = -1
 		case ' ':
-			grid[loc] = world.EMPTY
+			// Don't store empty locations. Grid should be represented by a sparse matrix
+			// grid[loc] = world.EMPTY
 		case '#':
 			grid[loc] = world.WALL
 		}
@@ -91,16 +92,19 @@ func parseWorldFromString(content string) (world.IWorld, error) {
 	splits := strings.Split(content, "\n\n")
 
 	grid := parseGridWorld(splits[0])
+	var w world.IWorld
 	if len(splits) > 1 {
 		objs, err := parseObjects(splits[1])
 		if err != nil {
 			return nil, err
 		}
 
-		return world.NewWorld(grid, objs), nil
+		w = world.NewWorld(grid, objs)
+	} else {
+		w = world.NewWorld(grid, make(objects.ObjectMap))
 	}
 
-	return world.NewWorld(grid, make(objects.ObjectMap)), nil
+	return w, nil
 }
 
 func ParseWorldFromFile(filename string) (world.IWorld, error) {
