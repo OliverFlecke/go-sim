@@ -47,6 +47,7 @@ func main() {
 
 	goalId := 0
 	totalActions := 0
+	var computationTime time.Duration = 0
 
 	for {
 		goal := getGoal(w, goalId)
@@ -54,11 +55,12 @@ func main() {
 			break
 		}
 
-		actions := solveGoal(goal, w, a)
+		actions, t := solveGoal(goal, w, a)
 		if actions == nil {
 			fmt.Printf("Unable to solve problem!")
 			return
 		}
+		computationTime += t
 		totalActions += len(actions)
 
 		sim.SetActions(a, actions)
@@ -73,20 +75,22 @@ func main() {
 	}
 
 	fmt.Printf("Problem solved.\n")
-	fmt.Printf("Total actions:   %d\n", totalActions)
-	fmt.Printf("Simulation time: %d\n", sim.GetTicks())
+	fmt.Printf("Total actions:               %d\n", totalActions)
+	fmt.Printf("Total computation time:      %v\n", computationTime)
+	fmt.Printf("Simulation time:             %d\n", sim.GetTicks())
 }
 
-func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) []action.Action {
+func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration) {
 	// fmt.Printf("\nSolving goal %v\n", goal)
+	startTime := time.Now()
 	box, err := findBox(w, a.GetLocation(), *goal)
 	if err != nil {
 		fmt.Println(err)
-		return nil
+		return nil, 0
 	}
 	if box == nil {
 		fmt.Println("No box found")
-		return nil
+		return nil, 0
 	}
 
 	p, _, err := pathfinding.FindPath(
@@ -97,7 +101,7 @@ func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) []action.Acti
 		nil)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
-		return nil
+		return nil, 0
 	}
 
 	actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) action.Action {
@@ -120,14 +124,14 @@ func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) []action.Acti
 		})
 	if err != nil {
 		fmt.Printf("Unable to find path from box to goal. Error: %s\n", err.Error())
-		return nil
+		return nil, 0
 	}
 	actions = append(actions, utils.Mapi(location.PathToDirections(p),
 		func(_ int, dir direction.Direction) action.Action {
 			return action.NewMoveWithBox(dir, box)
 		})...)
 
-	return actions
+	return actions, time.Since(startTime)
 }
 
 func getGoal(w world.IWorld, i int) *objects.Goal {
