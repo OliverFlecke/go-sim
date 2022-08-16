@@ -138,9 +138,9 @@ func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Act
 }
 
 func getGoal(w world.IWorld, i int) *objects.Goal {
-	goals := w.GetObjects(objects.GOAL)
-	if len(goals) > i {
-		return goals[i].(*objects.Goal)
+	goals := w.GetUnsolvedGoals()
+	if len(goals) > 0 {
+		return &goals[0]
 	}
 
 	return nil

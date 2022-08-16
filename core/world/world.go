@@ -15,6 +15,8 @@ type IWorld interface {
 	GetObjects(objects.WorldObjectKey) []objects.WorldObject
 	GetObjectsAtLocation(location.Location) []objects.WorldObject
 	MoveObject(o objects.WorldObject, newLoc location.Location)
+
+	GetUnsolvedGoals() []objects.Goal
 	IsSolved() bool
 
 	ToStringWithObjects() string
@@ -119,22 +121,36 @@ func (w *World) GetObjectsAtLocation(loc location.Location) []objects.WorldObjec
 func (w *World) IsSolved() bool {
 	solved := true
 	for _, x := range w.objects[objects.GOAL] {
-		g := x.(*objects.Goal)
-		gSolved := false
-		for _, o := range w.GetObjectsAtLocation(g.GetLocation()) {
-			switch box := o.(type) {
-			case *objects.Box:
-				gSolved = box.Matches(*g)
-			}
-		}
-
-		solved = solved && gSolved
+		solved = solved && w.isGoalSolved(x.(*objects.Goal))
 	}
 
 	return solved
 }
+func (w *World) GetUnsolvedGoals() []objects.Goal {
+	goals := make([]objects.Goal, 0)
+
+	for _, x := range w.objects[objects.GOAL] {
+		g := x.(*objects.Goal)
+		if !w.isGoalSolved(g) {
+			goals = append(goals, *g)
+		}
+	}
+
+	return goals
+}
 
 // End of IWorld implementation
+
+func (w *World) isGoalSolved(g *objects.Goal) bool {
+	for _, o := range w.GetObjectsAtLocation(g.GetLocation()) {
+		switch box := o.(type) {
+		case *objects.Box:
+			return box.Matches(*g)
+		}
+	}
+
+	return false
+}
 
 // Stringify
 
