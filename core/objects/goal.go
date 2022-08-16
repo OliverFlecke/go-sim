@@ -29,3 +29,7 @@ func NewGoal(location location.Location, goalType rune) *Goal {
 		goalType: goalType,
 	}
 }
+
+func (g *Goal) GetType() rune {
+	return g.goalType
+}

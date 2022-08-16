@@ -15,6 +15,7 @@ type IWorld interface {
 	GetObjects(objects.WorldObjectKey) []objects.WorldObject
 	GetObjectsAtLocation(location.Location) []objects.WorldObject
 	MoveObject(o objects.WorldObject, newLoc location.Location)
+	IsSolved() bool
 
 	ToStringWithObjects() string
 }
@@ -114,6 +115,26 @@ func (w *World) MoveObject(o objects.WorldObject, newLoc location.Location) {
 func (w *World) GetObjectsAtLocation(loc location.Location) []objects.WorldObject {
 	return w.objectMap[loc]
 }
+
+func (w *World) IsSolved() bool {
+	solved := true
+	for _, x := range w.objects[objects.GOAL] {
+		g := x.(*objects.Goal)
+		gSolved := false
+		for _, o := range w.GetObjectsAtLocation(g.GetLocation()) {
+			switch box := o.(type) {
+			case *objects.Box:
+				gSolved = box.Matches(*g)
+			}
+		}
+
+		solved = solved && gSolved
+	}
+
+	return solved
+}
+
+// End of IWorld implementation
 
 // Stringify
 

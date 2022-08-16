@@ -2,6 +2,7 @@ package objects
 
 import (
 	"simulator/core/location"
+	"unicode"
 )
 
 type Box struct {
@@ -20,7 +21,7 @@ func (b *Box) SetLocation(l location.Location) {
 }
 
 func (b *Box) GetRune() rune {
-	return b.boxType
+	return unicode.ToUpper(b.boxType)
 }
 
 // Constructor
@@ -35,4 +36,8 @@ func NewBox(location location.Location, boxType rune) *Box {
 
 func (b Box) GetType() rune {
 	return b.boxType
+}
+
+func (b *Box) Matches(g Goal) bool {
+	return unicode.ToLower(b.GetType()) == unicode.ToLower(g.GetType())
 }

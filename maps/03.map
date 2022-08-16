@@ -14,6 +14,6 @@ agent 0 1,1
 goal a 4,6
 goal a 6,6
 goal a 8,6
-box A 5,2
-box A 6,2
-box A 7,2
+box a 5,2
+box a 6,2
+box a 7,2

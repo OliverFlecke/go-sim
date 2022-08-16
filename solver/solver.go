@@ -15,7 +15,6 @@ import (
 	"simulator/core/world"
 	"simulator/pathfinding"
 	"time"
-	"unicode"
 )
 
 const defaultSpeed time.Duration = 250 * time.Millisecond
@@ -74,7 +73,11 @@ func main() {
 		goalId += 1
 	}
 
-	fmt.Printf("Problem solved.\n")
+	if w.IsSolved() {
+		fmt.Printf("Problem solved.\n")
+	} else {
+		fmt.Printf("Problem incorrectly solved\n")
+	}
 	fmt.Printf("Total actions:               %d\n", totalActions)
 	fmt.Printf("Total computation time:      %v\n", computationTime)
 	fmt.Printf("Simulation time:             %d\n", sim.GetTicks())
@@ -83,7 +86,7 @@ func main() {
 func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration) {
 	// fmt.Printf("\nSolving goal %v\n", goal)
 	startTime := time.Now()
-	box, err := findBox(w, a.GetLocation(), *goal)
+	box, err := findBox(w, a.GetLocation(), goal)
 	if err != nil {
 		fmt.Println(err)
 		return nil, 0
@@ -146,15 +149,15 @@ func getGoal(w world.IWorld, i int) *objects.Goal {
 func findBox(
 	w world.IWorld,
 	start location.Location,
-	goal objects.Goal) (*objects.Box, error) {
+	goal *objects.Goal) (*objects.Box, error) {
 	obj, err := pathfinding.FindLocation(w, start, func(l location.Location) objects.WorldObject {
 		var box *objects.Box = nil
-		var otherGoal objects.WorldObject
+		var otherGoal *objects.Goal
 
 		for _, obj := range w.GetObjectsAtLocation(l) {
 			switch v := obj.(type) {
 			case *objects.Box:
-				if unicode.ToLower(v.GetType()) == goal.GetRune() {
+				if v.Matches(*goal) {
 					box = v
 				}
 			case *objects.Goal:
@@ -162,7 +165,7 @@ func findBox(
 			}
 		}
 
-		if box == nil || (otherGoal != nil && unicode.ToLower(box.GetType()) == goal.GetRune()) {
+		if box == nil || (otherGoal != nil && box.Matches(*otherGoal)) {
 			return nil
 		}
 
