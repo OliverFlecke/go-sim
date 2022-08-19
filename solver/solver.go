@@ -92,6 +92,7 @@ func runSolverLoop(
 			if e.Err != nil {
 				return
 			}
+			logger.Verbose("%s\n", w.ToStringWithAgents())
 		}
 		goalId += 1
 	}

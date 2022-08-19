@@ -20,6 +20,7 @@ type IWorld interface {
 	IsSolved() bool
 
 	ToStringWithObjects() string
+	ToStringWithAgents() string
 }
 
 type WorldObjectMap map[location.Location][]objects.WorldObject
@@ -160,10 +161,10 @@ func (w *World) ToString() string {
 	})
 }
 
-func (w *World) ToStringWithAgents(agents []agent.Agent) string {
-	lookup := make(map[location.Location]agent.Agent)
-	for _, agent := range agents {
-		lookup[agent.GetLocation()] = agent
+func (w *World) ToStringWithAgents() string {
+	lookup := make(map[location.Location]*agent.Agent)
+	for _, a := range w.objects[objects.AGENT] {
+		lookup[a.GetLocation()] = a.(*agent.Agent)
 	}
 
 	return w.toStringHelper(func(l location.Location) rune {

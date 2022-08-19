@@ -7,6 +7,7 @@ import (
 
 type Action interface {
 	Perform(*agent.Agent, world.IWorld) ActionResult
+	ToString() string
 }
 
 type ActionResult struct {

@@ -2,7 +2,7 @@ package simulationMap
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"regexp"
 	"simulator/core/agent"
 	"simulator/core/location"
@@ -71,7 +71,7 @@ func parseObjects(str string) (objects.ObjectMap, error) {
 
 			switch match[typeIdx] {
 			case "agent":
-				agent := agent.NewAgentWithStartLocation("unused", id, loc)
+				agent := agent.NewAgentWithStartLocation(string(id), id, loc)
 				result[objects.AGENT] = append(result[objects.AGENT], agent)
 			case "box":
 				box := objects.NewBox(loc, id)
@@ -108,7 +108,7 @@ func parseWorldFromString(content string) (world.IWorld, error) {
 }
 
 func ParseWorldFromFile(filename string) (world.IWorld, error) {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}

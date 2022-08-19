@@ -2,7 +2,6 @@ package simulator
 
 import (
 	"fmt"
-	"reflect"
 	"simulator/core/action"
 	"simulator/core/agent"
 	"simulator/core/logger"
@@ -78,10 +77,10 @@ func (s *Simulation) internalRun() (bool, error) {
 	for agent, actions := range s.actions {
 		if len(actions) > 0 {
 			action := actions[0]
-			// fmt.Printf("\nAgent %c performing action %v\n", agent.callsign, reflect.TypeOf(action))
+			fmt.Printf("Agent %c performing action %v\n", agent.GetRune(), action.ToString())
 			result := action.Perform(agent, s.world)
 			if result.Err != nil {
-				logger.Error("Action failed. %v\nerr: %v\n", reflect.TypeOf(action), result.Err.Error())
+				logger.Error("Action failed. %v\nerr: %v\n", action.ToString(), result.Err.Error())
 				fmt.Println(s.world.ToStringWithObjects())
 				return true, result.Err
 			}

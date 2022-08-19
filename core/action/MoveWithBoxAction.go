@@ -41,6 +41,8 @@ func isValidMoveWithBox(w world.IWorld, newL location.Location) error {
 	return nil
 }
 
+// IMPL: Action interface
+
 func (action MoveWithBoxAction) Perform(a *agent.Agent, w world.IWorld) ActionResult {
 	newLoc := a.GetLocation().MoveInDirection(action.dir)
 	err := isValidMoveWithBox(w, newLoc)
@@ -52,4 +54,8 @@ func (action MoveWithBoxAction) Perform(a *agent.Agent, w world.IWorld) ActionRe
 	w.MoveObject(action.box, newLoc)
 
 	return success()
+}
+
+func (a MoveWithBoxAction) ToString() string {
+	return fmt.Sprintf("MoveWithBox - location %v, dir %s", a.box.GetLocation(), a.dir.ToString())
 }
