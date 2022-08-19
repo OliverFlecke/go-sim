@@ -48,30 +48,9 @@ func main() {
 	totalActions := 0
 	var computationTime time.Duration = 0
 
-	for {
-		goal := getGoal(w, goalId)
-		if goal == nil {
-			break
-		}
-
-		actions, t := solveGoal(goal, w, a)
-		if actions == nil {
-			fmt.Printf("Unable to solve problem!")
-			return
-		}
-		computationTime += t
-		totalActions += len(actions)
-
-		sim.SetActions(a, actions)
-		quit := make(chan bool)
-		ticker := sim.Run(quit)
-
-		for range ticker {
-			// fmt.Printf("\n\nWorld at %s\n", t)
-			// fmt.Print(w.ToStringWithObjects())
-		}
-		goalId += 1
-	}
+	// fmt.Printf("\n\nWorld at %s\n", t)
+	// fmt.Print(w.ToStringWithObjects())
+	runSolverLoop(w, goalId, a, &computationTime, &totalActions, sim)
 
 	if w.IsSolved() {
 		fmt.Printf("Problem solved.\n")
@@ -81,6 +60,40 @@ func main() {
 	fmt.Printf("Total actions:               %d\n", totalActions)
 	fmt.Printf("Total computation time:      %v\n", computationTime)
 	fmt.Printf("Simulation time:             %d\n", sim.GetTicks())
+}
+
+func runSolverLoop(
+	w world.IWorld,
+	goalId int,
+	a *agent.Agent,
+	computationTime *time.Duration,
+	totalActions *int,
+	sim *simulator.Simulation) {
+	for {
+		goal := getGoal(w, goalId)
+		if goal == nil {
+			break
+		}
+
+		actions, t := solveGoal(goal, w, a)
+		if actions == nil {
+			fmt.Printf("Unable to solve problem!")
+			break
+		}
+		*computationTime += t
+		*totalActions += len(actions)
+
+		sim.SetActions(a, actions)
+		quit := make(chan bool)
+		events := sim.Run(quit)
+
+		for e := range events {
+			if e.Err != nil {
+				return
+			}
+		}
+		goalId += 1
+	}
 }
 
 func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration) {

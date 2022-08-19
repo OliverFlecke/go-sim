@@ -2,6 +2,7 @@ package simulator
 
 import (
 	"fmt"
+	"reflect"
 	"simulator/core/action"
 	"simulator/core/agent"
 	"simulator/core/world"
@@ -31,14 +32,14 @@ func (s *Simulation) SetActions(agent *agent.Agent, actions []action.Action) {
 	s.actions[agent] = append(s.actions[agent], actions...)
 }
 
-func (s *Simulation) Run(quit chan bool) <-chan time.Time {
-	output := make(chan time.Time)
+func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
+	output := make(chan SimulationEvent)
 	if s.options.tickDuration == 0 {
 		go func() {
 			defer close(output)
 			for {
-				finished := s.internalRun()
-				output <- time.Now()
+				finished, err := s.internalRun()
+				output <- SimulationEvent{CurrentTime: time.Now(), Err: err}
 				if finished {
 					return
 				}
@@ -57,8 +58,8 @@ func (s *Simulation) Run(quit chan bool) <-chan time.Time {
 					fmt.Println("Stopping simulation")
 					return
 				case t := <-ticker.C:
-					finished := s.internalRun()
-					output <- t
+					finished, err := s.internalRun()
+					output <- SimulationEvent{CurrentTime: t, Err: err}
 
 					if finished {
 						return
@@ -71,7 +72,7 @@ func (s *Simulation) Run(quit chan bool) <-chan time.Time {
 
 }
 
-func (s *Simulation) internalRun() bool {
+func (s *Simulation) internalRun() (bool, error) {
 	s.ticks++
 	finished := true
 	for agent, actions := range s.actions {
@@ -80,7 +81,9 @@ func (s *Simulation) internalRun() bool {
 			// fmt.Printf("\nAgent %c performing action %v\n", agent.callsign, reflect.TypeOf(action))
 			result := action.Perform(agent, s.world)
 			if result.Err != nil {
-				fmt.Printf("Action failed: %v\n", result.Err.Error())
+				fmt.Printf("Action failed. %v err: %v\n", reflect.TypeOf(action), result.Err.Error())
+				fmt.Println(s.world.ToStringWithObjects())
+				return true, result.Err
 			}
 
 			s.actions[agent] = actions[1:]
@@ -88,5 +91,5 @@ func (s *Simulation) internalRun() bool {
 		}
 	}
 
-	return finished
+	return finished, nil
 }

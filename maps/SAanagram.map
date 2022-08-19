@@ -1,0 +1,33 @@
+#################
+#               #
+#               # 
+#               #
+#################
+
+box E 1,1
+box L 2,1
+box E 3,1
+box V 4,1
+box E 5,1
+box N 6,1
+box P 8,1
+box L 9,1
+box U 10,1
+box S 11,1
+box T 13,1
+box W 14,1
+box O 15,1
+agent 0 8,2
+goal t 1,3
+goal w 2,3
+goal e 3,3
+goal l 4,3
+goal v 5,3
+goal e 6,3
+goal p 8,3
+goal l 9,3
+goal u 10,3
+goal s 11,3
+goal o 13,3
+goal n 14,3
+goal e 15,3
