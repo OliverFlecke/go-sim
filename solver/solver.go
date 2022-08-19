@@ -9,6 +9,7 @@ import (
 	"simulator/core/agent"
 	"simulator/core/direction"
 	"simulator/core/location"
+	"simulator/core/logger"
 	maps "simulator/core/map"
 	"simulator/core/objects"
 	"simulator/core/utils"
@@ -53,13 +54,13 @@ func main() {
 	runSolverLoop(w, goalId, a, &computationTime, &totalActions, sim)
 
 	if w.IsSolved() {
-		fmt.Printf("Problem solved.\n")
+		logger.Info("Problem solved.\n")
 	} else {
-		fmt.Printf("Problem incorrectly solved\n")
+		logger.Error("Problem incorrectly solved\n")
 	}
-	fmt.Printf("Total actions:               %d\n", totalActions)
-	fmt.Printf("Total computation time:      %v\n", computationTime)
-	fmt.Printf("Simulation time:             %d\n", sim.GetTicks())
+	logger.Verbose("Total actions:               %d\n", totalActions)
+	logger.Verbose("Total computation time:      %v\n", computationTime)
+	logger.Verbose("Simulation time:             %d\n", sim.GetTicks())
 }
 
 func runSolverLoop(

@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"simulator/core/action"
 	"simulator/core/agent"
+	"simulator/core/logger"
 	"simulator/core/world"
 	"time"
 )
@@ -69,7 +70,6 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 		}()
 	}
 	return output
-
 }
 
 func (s *Simulation) internalRun() (bool, error) {
@@ -81,7 +81,7 @@ func (s *Simulation) internalRun() (bool, error) {
 			// fmt.Printf("\nAgent %c performing action %v\n", agent.callsign, reflect.TypeOf(action))
 			result := action.Perform(agent, s.world)
 			if result.Err != nil {
-				fmt.Printf("Action failed. %v err: %v\n", reflect.TypeOf(action), result.Err.Error())
+				logger.Error("Action failed. %v\nerr: %v\n", reflect.TypeOf(action), result.Err.Error())
 				fmt.Println(s.world.ToStringWithObjects())
 				return true, result.Err
 			}
