@@ -14,6 +14,7 @@ type Simulation struct {
 	options SimulationOptions
 	actions map[*agent.Agent][]action.Action
 	ticks   uint64
+	output  chan SimulationEvent
 }
 
 func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
@@ -21,7 +22,12 @@ func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
 		world:   world,
 		options: options,
 		actions: make(map[*agent.Agent][]action.Action),
+		output:  make(chan SimulationEvent),
 	}
+}
+
+func (s *Simulation) GetEvents() <-chan SimulationEvent {
+	return s.output
 }
 
 func (s *Simulation) GetTicks() uint64 {
@@ -33,13 +39,12 @@ func (s *Simulation) SetActions(agent *agent.Agent, actions []action.Action) {
 }
 
 func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
-	output := make(chan SimulationEvent)
 	if s.options.tickDuration == 0 {
 		go func() {
-			defer close(output)
+			defer close(s.output)
 			for {
 				finished, err := s.internalRun()
-				output <- SimulationEvent{CurrentTime: time.Now(), Err: err}
+				s.output <- SimulationEvent{CurrentTime: time.Now(), Err: err}
 				if finished {
 					return
 				}
@@ -50,7 +55,7 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 
 		go func() {
 			defer ticker.Stop()
-			defer close(output)
+			defer close(s.output)
 
 			for {
 				select {
@@ -58,17 +63,17 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 					fmt.Println("Stopping simulation")
 					return
 				case t := <-ticker.C:
-					finished, err := s.internalRun()
-					output <- SimulationEvent{CurrentTime: t, Err: err}
+					_, err := s.internalRun()
+					s.output <- SimulationEvent{CurrentTime: t, Err: err}
 
-					if finished {
-						return
-					}
+					// if finished {
+					// 	return
+					// }
 				}
 			}
 		}()
 	}
-	return output
+	return s.output
 }
 
 func (s *Simulation) internalRun() (bool, error) {
