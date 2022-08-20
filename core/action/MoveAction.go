@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"simulator/core/agent"
 	"simulator/core/direction"
-	"simulator/core/location"
 	"simulator/core/world"
 )
 
@@ -19,18 +18,20 @@ func NewMove(dir direction.Direction) *MoveAction {
 	}
 }
 
-func isValidMove(w world.IWorld, newLoc location.Location) bool {
+func (action *MoveAction) IsValid(a *agent.Agent, w world.IWorld) bool {
+	newLoc := a.GetLocation().MoveInDirection(action.dir)
+
 	return w.GetLocation(newLoc) == world.EMPTY
 }
 
 // IMPL: Action interface
 
 func (m MoveAction) Perform(a *agent.Agent, w world.IWorld) ActionResult {
-	newLoc := a.GetLocation().MoveInDirection(m.dir)
-	if !isValidMove(w, newLoc) {
+	if !m.IsValid(a, w) {
 		return failure(fmt.Errorf("new location is not free"))
 	}
 
+	newLoc := a.GetLocation().MoveInDirection(m.dir)
 	w.MoveObject(a, newLoc)
 
 	return success()

@@ -25,7 +25,7 @@ func NewMoveWithBox(
 }
 
 func isValidMoveWithBox(w world.IWorld, newL location.Location) error {
-	if !isValidMove(w, newL) {
+	if w.GetLocation(newL) != world.EMPTY {
 		return fmt.Errorf("agent cannot move here")
 	}
 

@@ -9,6 +9,13 @@ const (
 	WEST
 )
 
+var All = []Direction{
+	NORTH,
+	EAST,
+	SOUTH,
+	WEST,
+}
+
 func (d Direction) ToString() string {
 	switch d {
 	case NORTH:

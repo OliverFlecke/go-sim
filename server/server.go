@@ -4,11 +4,15 @@ package main
 
 import (
 	"io"
+	"math/rand"
 	"time"
 
 	simulator "simulator/core"
+	"simulator/core/action"
+	"simulator/core/direction"
 	maps "simulator/core/map"
 	"simulator/core/objects"
+	"simulator/core/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,8 +36,28 @@ func main() {
 	r.GET("/stream", StreamHandler)
 	r.GET("/simulation/map", getMapOfWorld)
 
+	genAction()
 	go sim.Run(nil)
+
 	r.Run() // listen and serve on 0.0.0.0:8080
+}
+
+func genAction() {
+	// TEMP: generating random actions to keep sim running
+	a := sim.GetWorld().GetAgents()[0]
+	if len(sim.GetActions(a)) > 0 {
+		return
+	}
+
+	potential := utils.Filteri(
+		utils.Mapi(direction.All, func(_ int, dir direction.Direction) action.MoveAction {
+			return *action.NewMove(dir)
+		}),
+		func(_ int, act action.MoveAction) bool {
+			return act.IsValid(a, sim.GetWorld())
+		})
+	// logger.Verbose("Agent: %v, Actions: %v\n", a, potential)
+	sim.SetActions(a, []action.Action{potential[rand.Intn(len(potential))]})
 }
 
 func StreamHandler(c *gin.Context) {
@@ -43,8 +67,12 @@ func StreamHandler(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	c.Stream(func(w io.Writer) bool {
-		if e, ok := <-sim.GetEvents(); ok {
-			c.SSEvent("tick", e.CurrentTime)
+		if _, ok := <-sim.GetEvents(); ok {
+			// c.SSEvent("tick", e.CurrentTime)
+			a := sim.GetWorld().GetAgents()[0]
+			c.SSEvent("move", a)
+
+			genAction()
 			return true
 		}
 
@@ -53,6 +81,8 @@ func StreamHandler(c *gin.Context) {
 }
 
 func getMapOfWorld(c *gin.Context) {
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+
 	objs := make(map[string][]objects.WorldObject)
 	objs["agent"] = sim.GetWorld().GetObjects(objects.AGENT)
 	objs["goal"] = sim.GetWorld().GetObjects(objects.GOAL)

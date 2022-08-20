@@ -7,8 +7,8 @@ import (
 )
 
 type Location struct {
-	X int
-	Y int
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
 // CONSTRUCTOR

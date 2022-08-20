@@ -44,6 +44,10 @@ func (s *Simulation) SetActions(agent *agent.Agent, actions []action.Action) {
 	s.actions[agent] = append(s.actions[agent], actions...)
 }
 
+func (s *Simulation) GetActions(a *agent.Agent) []action.Action {
+	return s.actions[a]
+}
+
 func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 	if s.options.tickDuration == 0 {
 		go func() {
@@ -88,7 +92,7 @@ func (s *Simulation) internalRun() (bool, error) {
 	for agent, actions := range s.actions {
 		if len(actions) > 0 {
 			action := actions[0]
-			fmt.Printf("Agent %c performing action %v\n", agent.GetRune(), action.ToString())
+			// fmt.Printf("Agent %c performing action %v. Remaining: %d\n", agent.GetRune(), action.ToString(), len(actions)-1)
 			result := action.Perform(agent, s.world)
 			if result.Err != nil {
 				logger.Error("Action failed. %v\nerr: %v\n", action.ToString(), result.Err.Error())
@@ -98,6 +102,8 @@ func (s *Simulation) internalRun() (bool, error) {
 
 			s.actions[agent] = actions[1:]
 			finished = finished && len(s.actions[agent]) == 0
+		} else {
+			fmt.Printf("No actions for %v\n", agent)
 		}
 	}
 

@@ -13,8 +13,10 @@ type IWorld interface {
 	GetMap() Grid
 	GetLocation(location.Location) GridType
 	GetNeighbors(location.Location) []location.Location
+	GetAgents() []*agent.Agent
 	GetObjects(objects.WorldObjectKey) []objects.WorldObject
 	GetObjectsAtLocation(location.Location) []objects.WorldObject
+
 	MoveObject(o objects.WorldObject, newLoc location.Location)
 
 	GetUnsolvedGoals() []objects.Goal
@@ -104,6 +106,12 @@ func (world *World) GetNeighbors(loc location.Location) []location.Location {
 
 func (w *World) GetObjects(key objects.WorldObjectKey) []objects.WorldObject {
 	return w.objects[key]
+}
+
+func (w *World) GetAgents() []*agent.Agent {
+	return utils.Mapi(w.objects[objects.AGENT], func(_ int, o objects.WorldObject) *agent.Agent {
+		return o.(*agent.Agent)
+	})
 }
 
 func (w *World) MoveObject(o objects.WorldObject, newLoc location.Location) {
