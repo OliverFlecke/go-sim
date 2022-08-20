@@ -10,6 +10,7 @@ import (
 )
 
 type IWorld interface {
+	GetMap() Grid
 	GetLocation(location.Location) GridType
 	GetNeighbors(location.Location) []location.Location
 	GetObjects(objects.WorldObjectKey) []objects.WorldObject
@@ -19,6 +20,7 @@ type IWorld interface {
 	GetUnsolvedGoals() []objects.Goal
 	IsSolved() bool
 
+	GetStaticMapAsString() string
 	ToStringWithObjects() string
 	ToStringWithAgents() string
 }
@@ -155,7 +157,7 @@ func (w *World) isGoalSolved(g *objects.Goal) bool {
 
 // Stringify
 
-func (w *World) ToString() string {
+func (w *World) GetStaticMapAsString() string {
 	return w.toStringHelper(func(l location.Location) rune {
 		return ToRune(w.GetLocation(l))
 	})
@@ -221,7 +223,7 @@ func (w *World) toStringHelper(toRune func(location.Location) rune) string {
 		for x := 0; x <= corner.X; x++ {
 			str.WriteRune(toRune(location.New(x, y)))
 		}
-		str.WriteString("\n")
+		str.WriteRune('\n')
 	}
 
 	return str.String()[:str.Len()-1]

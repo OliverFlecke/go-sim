@@ -32,8 +32,8 @@ import (
 func TestNewAgent(t *testing.T) {
 	a := NewAgent("Agent A", 'A')
 	b := NewAgent("Agent B", 'B')
-	utils.AssertEqual(t, a.callsign, 'A')
-	utils.AssertEqual(t, b.callsign, 'B')
+	utils.AssertEqual(t, a.Callsign, 'A')
+	utils.AssertEqual(t, b.Callsign, 'B')
 }
 
 // func TestIsValidMove(t *testing.T) {

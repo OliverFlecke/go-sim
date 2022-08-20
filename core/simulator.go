@@ -26,6 +26,12 @@ func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
 	}
 }
 
+// Getters
+
+func (s *Simulation) GetWorld() world.IWorld {
+	return s.world
+}
+
 func (s *Simulation) GetEvents() <-chan SimulationEvent {
 	return s.output
 }

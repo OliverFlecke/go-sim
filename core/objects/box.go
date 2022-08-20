@@ -6,36 +6,36 @@ import (
 )
 
 type Box struct {
-	location location.Location
-	boxType  rune
+	Location location.Location `json:"location"`
+	Type     rune              `json:"type"`
 }
 
 // IMPL: WorldObject interface
 
 func (b *Box) GetLocation() location.Location {
-	return b.location
+	return b.Location
 }
 
 func (b *Box) SetLocation(l location.Location) {
-	b.location = l
+	b.Location = l
 }
 
 func (b *Box) GetRune() rune {
-	return unicode.ToUpper(b.boxType)
+	return unicode.ToUpper(b.Type)
 }
 
 // Constructor
 func NewBox(location location.Location, boxType rune) *Box {
 	return &Box{
-		location: location,
-		boxType:  boxType,
+		Location: location,
+		Type:     boxType,
 	}
 }
 
 // Getters
 
 func (b Box) GetType() rune {
-	return b.boxType
+	return b.Type
 }
 
 func (b *Box) Matches(g Goal) bool {

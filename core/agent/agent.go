@@ -5,37 +5,37 @@ import (
 )
 
 type Agent struct {
-	callsign rune
+	Location location.Location `json:"location"`
+	Callsign rune              `json:"callsign"`
 	name     string
-	location location.Location
 }
 
 // Simple constructor
 func NewAgent(name string, callsign rune) *Agent {
 	return &Agent{
-		callsign: callsign,
+		Callsign: callsign,
 		name:     name,
-		location: location.Location{},
+		Location: location.Location{},
 	}
 }
 
 func NewAgentWithStartLocation(name string, callsign rune, start location.Location) *Agent {
 	return &Agent{
-		callsign: callsign,
+		Callsign: callsign,
 		name:     name,
-		location: start,
+		Location: start,
 	}
 }
 
 // IMPL: WorldObject interface
 func (a Agent) GetLocation() location.Location {
-	return a.location
+	return a.Location
 }
 
 func (a *Agent) SetLocation(l location.Location) {
-	a.location = l
+	a.Location = l
 }
 
 func (a *Agent) GetRune() rune {
-	return a.callsign
+	return a.Callsign
 }

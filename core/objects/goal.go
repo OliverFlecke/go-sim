@@ -3,33 +3,33 @@ package objects
 import "simulator/core/location"
 
 type Goal struct {
-	location location.Location
-	goalType rune
+	Location location.Location `json:"location"`
+	Type     rune              `json:"type"`
 }
 
 // IMPL: WorldObject interface
 
 func (g *Goal) GetLocation() location.Location {
-	return g.location
+	return g.Location
 }
 
 func (g *Goal) SetLocation(l location.Location) {
-	g.location = l
+	g.Location = l
 }
 
 func (g *Goal) GetRune() rune {
-	return g.goalType
+	return g.Type
 }
 
 // CONSTRUCTORS
 
 func NewGoal(location location.Location, goalType rune) *Goal {
 	return &Goal{
-		location: location,
-		goalType: goalType,
+		Location: location,
+		Type:     goalType,
 	}
 }
 
 func (g *Goal) GetType() rune {
-	return g.goalType
+	return g.Type
 }

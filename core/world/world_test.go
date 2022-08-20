@@ -1,7 +1,6 @@
 package world
 
 import (
-	"simulator/core/agent"
 	"simulator/core/location"
 	"simulator/core/objects"
 	"testing"
@@ -22,7 +21,7 @@ func TestToString(t *testing.T) {
 	world := NewGridWorld(3)
 	expected := "#####\n#   #\n#   #\n#   #\n#####"
 
-	actual := world.ToString()
+	actual := world.GetStaticMapAsString()
 	if actual != expected {
 		t.Fatalf("World does not look the way it should! Actual '%s'", actual)
 	}
@@ -30,12 +29,12 @@ func TestToString(t *testing.T) {
 
 func TestToStringWithAgents(t *testing.T) {
 	world := NewGridWorld(3)
-	agents := []agent.Agent{
-		*agent.NewAgentWithStartLocation("Test agent", '0', location.New(2, 2)),
-	}
+	// agents := []agent.Agent{
+	// 	*agent.NewAgentWithStartLocation("Test agent", '0', location.New(2, 2)),
+	// }
 	expected := "#####\n#   #\n# 0 #\n#   #\n#####"
 
-	actual := world.ToStringWithAgents(agents)
+	actual := world.ToStringWithAgents()
 
 	if actual != expected {
 		t.Fatalf(`World with agents does not look as expected '%s'. Actual: '%s'`, expected, actual)

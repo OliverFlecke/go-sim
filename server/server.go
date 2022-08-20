@@ -8,6 +8,7 @@ import (
 
 	simulator "simulator/core"
 	maps "simulator/core/map"
+	"simulator/core/objects"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +30,8 @@ func main() {
 		})
 	})
 	r.GET("/stream", StreamHandler)
+	r.GET("/simulation/map", getMapOfWorld)
+
 	go sim.Run(nil)
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
@@ -39,25 +42,24 @@ func StreamHandler(c *gin.Context) {
 	c.Writer.Header().Set("Connection", "keep-alive")
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
-	// stream := make(chan time.Time)
-	// go func() {
-	// 	defer close(stream)
-	// 	for {
-	// 		stream <- time.Now()
-	// 		time.Sleep(1 * time.Second)
-	// 	}
-	// }()
-
 	c.Stream(func(w io.Writer) bool {
 		if e, ok := <-sim.GetEvents(); ok {
 			c.SSEvent("tick", e.CurrentTime)
 			return true
 		}
-		// if msg, ok := <-stream; ok {
-		// 	c.SSEvent("message", msg)
-		// 	return true
-		// }
 
 		return false
+	})
+}
+
+func getMapOfWorld(c *gin.Context) {
+	objs := make(map[string][]objects.WorldObject)
+	objs["agent"] = sim.GetWorld().GetObjects(objects.AGENT)
+	objs["goal"] = sim.GetWorld().GetObjects(objects.GOAL)
+	objs["box"] = sim.GetWorld().GetObjects(objects.BOX)
+
+	c.JSON(200, gin.H{
+		"world": objs,
+		"grid":  sim.GetWorld().GetStaticMapAsString(),
 	})
 }
