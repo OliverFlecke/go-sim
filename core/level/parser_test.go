@@ -1,4 +1,4 @@
-package simulationMap
+package level
 
 import (
 	"reflect"
@@ -21,8 +21,7 @@ func TestParseStringToMap(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(w.GetMap(), expected.GetMap()) {
-		t.Fatalf("Parsed world does not match. Expected:\n%v\nActual:\n%v. Maps: Expected:\n%v\nActual:\n%v",
-			expected.ToString(), w.ToString(), expected.GetMap(), w.GetMap())
+		t.Fatalf("Parsed world does not match. Maps: Expected:\n%v\nActual:\n%v", expected.GetMap(), w.GetMap())
 	}
 }
 

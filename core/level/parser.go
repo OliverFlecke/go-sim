@@ -1,4 +1,4 @@
-package simulationMap
+package level
 
 import (
 	"fmt"

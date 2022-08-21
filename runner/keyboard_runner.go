@@ -13,7 +13,7 @@ import (
 	"simulator/core/action"
 	"simulator/core/agent"
 	"simulator/core/direction"
-	maps "simulator/core/map"
+	"simulator/core/level"
 	"simulator/core/objects"
 	"simulator/core/world"
 
@@ -28,7 +28,7 @@ func main() {
 	}
 	mapName := os.Args[1]
 	var err error
-	w, err := maps.ParseWorldFromFile(mapName)
+	w, err := level.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -8,9 +8,9 @@ import (
 	"simulator/core/action"
 	"simulator/core/agent"
 	"simulator/core/direction"
+	"simulator/core/level"
 	"simulator/core/location"
 	"simulator/core/logger"
-	maps "simulator/core/map"
 	"simulator/core/objects"
 	"simulator/core/utils"
 	"simulator/core/world"
@@ -32,7 +32,7 @@ func main() {
 			return
 		}
 	}
-	w, err := maps.ParseWorldFromFile(mapName)
+	w, err := level.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
 	}

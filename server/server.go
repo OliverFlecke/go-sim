@@ -10,7 +10,7 @@ import (
 	simulator "simulator/core"
 	"simulator/core/action"
 	"simulator/core/direction"
-	maps "simulator/core/map"
+	"simulator/core/level"
 	"simulator/core/objects"
 	"simulator/core/utils"
 
@@ -21,7 +21,7 @@ var sim *simulator.Simulation
 
 func main() {
 	mapName := "../maps/04.map"
-	w, _ := maps.ParseWorldFromFile(mapName)
+	w, _ := level.ParseWorldFromFile(mapName)
 
 	opt := simulator.SimulationOptions{}
 	opt.SetTickDuration(250 * time.Millisecond)
