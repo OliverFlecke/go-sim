@@ -76,7 +76,7 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 					s.output <- SimulationEvent{CurrentTime: t, Err: err}
 
 					if finished {
-						return
+						// return
 					}
 				}
 			}
