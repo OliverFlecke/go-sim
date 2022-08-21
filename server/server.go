@@ -68,9 +68,12 @@ func StreamHandler(c *gin.Context) {
 
 	c.Stream(func(w io.Writer) bool {
 		if _, ok := <-sim.GetEvents(); ok {
-			// c.SSEvent("tick", e.CurrentTime)
-			a := sim.GetWorld().GetAgents()[0]
-			c.SSEvent("move", a)
+			w := sim.GetWorld()
+			c.SSEvent("move", gin.H{
+				"agents": w.GetAgents(),
+				"boxes":  w.GetObjects(objects.BOX),
+				"goals":  w.GetObjects(objects.GOAL),
+			})
 
 			genAction()
 			return true
@@ -83,13 +86,14 @@ func StreamHandler(c *gin.Context) {
 func getMapOfWorld(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
+	w := sim.GetWorld()
 	objs := make(map[string][]objects.WorldObject)
-	objs["agent"] = sim.GetWorld().GetObjects(objects.AGENT)
-	objs["goal"] = sim.GetWorld().GetObjects(objects.GOAL)
-	objs["box"] = sim.GetWorld().GetObjects(objects.BOX)
+	objs["agents"] = w.GetObjects(objects.AGENT)
+	objs["goals"] = w.GetObjects(objects.GOAL)
+	objs["boxes"] = w.GetObjects(objects.BOX)
 
 	c.JSON(200, gin.H{
-		"world": objs,
-		"grid":  sim.GetWorld().GetStaticMapAsString(),
+		"state": objs,
+		"grid":  w.GetStaticMapAsString(),
 	})
 }
