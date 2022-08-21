@@ -92,7 +92,11 @@ func runSolverLoop(
 			if e.Err != nil {
 				return
 			}
-			logger.Verbose("%s\n", w.ToStringWithAgents())
+			// logger.Verbose("%s\n", w.ToStringWithObjects())
+
+			if len(sim.GetActions(a)) == 0 {
+				break
+			}
 		}
 		goalId += 1
 	}

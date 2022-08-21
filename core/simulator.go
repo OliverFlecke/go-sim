@@ -65,7 +65,6 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 
 		go func() {
 			defer ticker.Stop()
-			defer close(s.output)
 
 			for {
 				select {
@@ -73,12 +72,12 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 					fmt.Println("Stopping simulation")
 					return
 				case t := <-ticker.C:
-					_, err := s.internalRun()
+					finished, err := s.internalRun()
 					s.output <- SimulationEvent{CurrentTime: t, Err: err}
 
-					// if finished {
-					// 	return
-					// }
+					if finished {
+						return
+					}
 				}
 			}
 		}()
@@ -102,8 +101,6 @@ func (s *Simulation) internalRun() (bool, error) {
 
 			s.actions[agent] = actions[1:]
 			finished = finished && len(s.actions[agent]) == 0
-		} else {
-			fmt.Printf("No actions for %v\n", agent)
 		}
 	}
 
