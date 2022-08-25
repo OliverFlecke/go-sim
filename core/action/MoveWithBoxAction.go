@@ -24,6 +24,14 @@ func NewMoveWithBox(
 	}
 }
 
+func (a *MoveWithBoxAction) GetDirection() direction.Direction {
+	return a.dir
+}
+
+func (a *MoveWithBoxAction) GetBoxId() uint32 {
+	return a.box.GetId()
+}
+
 func isValidMoveWithBox(w world.IWorld, newL location.Location) error {
 	if w.GetLocation(newL) != world.EMPTY {
 		return fmt.Errorf("agent cannot move here")

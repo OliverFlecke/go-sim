@@ -26,7 +26,7 @@ func main() {
 	w, _ := level.ParseWorldFromFile(mapName)
 
 	opt := simulator.SimulationOptions{}
-	opt.SetTickDuration(250 * time.Millisecond)
+	opt.SetTickDuration(20 * time.Millisecond)
 	sim = simulator.NewSimulation(w, opt)
 
 	r := gin.Default()
@@ -60,7 +60,7 @@ func parseAction(c *gin.Context) ([]action.Action, error) {
 		return nil, err
 	}
 
-	logger.Info("got bytes from body: %v\n", string(bytes))
+	// logger.Info("got bytes from body: %v\n", string(bytes))
 	acts := &dto.ActionList{}
 	if err := protojson.Unmarshal(bytes, acts); err != nil {
 		logger.Error("Unable to parse text %v", err.Error())

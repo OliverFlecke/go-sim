@@ -6,6 +6,7 @@ import (
 )
 
 type Box struct {
+	id       uint32
 	Location location.Location `json:"location"`
 	Type     rune              `json:"type"`
 }
@@ -24,15 +25,24 @@ func (b *Box) GetRune() rune {
 	return unicode.ToUpper(b.Type)
 }
 
+var boxCount uint32 = 0
+
 // Constructor
 func NewBox(location location.Location, boxType rune) *Box {
+	id := boxCount
+	boxCount += 1
 	return &Box{
+		id:       id,
 		Location: location,
 		Type:     boxType,
 	}
 }
 
 // Getters
+
+func (b Box) GetId() uint32 {
+	return b.id
+}
 
 func (b Box) GetType() rune {
 	return b.Type

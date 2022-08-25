@@ -16,8 +16,11 @@ import (
 	"simulator/core/objects"
 	"simulator/core/utils"
 	"simulator/core/world"
+	"simulator/model/mapping"
 	"simulator/pathfinding"
 	"time"
+
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const defaultSpeed time.Duration = 250 * time.Millisecond
@@ -108,23 +111,27 @@ func runSolverLoop(
 func sendActions(a *agent.Agent, acts []action.Action) {
 	httpposturl := "http://localhost:8080/agent/0"
 
-	var jsonData = []byte(`[{
-		"type": "Move",
-		"direction": "North"
-	}]`)
-	request, err := http.NewRequest("POST", httpposturl, bytes.NewBuffer(jsonData))
+	dtos := mapping.ToDtos(acts)
+	data, err := protojson.Marshal(dtos)
 	if err != nil {
+		logger.Error("%v\n", err.Error())
+		return
+	}
+
+	request, err := http.NewRequest("POST", httpposturl, bytes.NewBuffer(data))
+	if err != nil {
+		logger.Error("%v\n", err.Error())
 		return
 	}
 	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
-
 	client := &http.Client{}
 	res, err := client.Do(request)
 	if err != nil {
-		panic(err)
+		logger.Error("%v\n", err.Error())
+		return
 	}
 
-	logger.Info(`Status: %d\n`, res.StatusCode)
+	logger.Info("Status: %d\n", res.StatusCode)
 }
 
 func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration) {
