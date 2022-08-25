@@ -18,6 +18,10 @@ func NewMove(dir direction.Direction) *MoveAction {
 	}
 }
 
+func (a *MoveAction) GetDirection() direction.Direction {
+	return a.dir
+}
+
 func (action *MoveAction) IsValid(a *agent.Agent, w world.IWorld) bool {
 	newLoc := a.GetLocation().MoveInDirection(action.dir)
 

@@ -20,6 +20,7 @@ type IWorld interface {
 	MoveObject(o objects.WorldObject, newLoc location.Location)
 
 	GetUnsolvedGoals() []objects.Goal
+	GetBoxes() []objects.Box
 	IsSolved() bool
 
 	GetStaticMapAsString() string
@@ -148,6 +149,17 @@ func (w *World) GetUnsolvedGoals() []objects.Goal {
 	}
 
 	return goals
+}
+
+func (w *World) GetBoxes() []objects.Box {
+	boxes := make([]objects.Box, 0)
+
+	for _, x := range w.objects[objects.BOX] {
+		box := x.(*objects.Box)
+		boxes = append(boxes, *box)
+	}
+
+	return boxes
 }
 
 // End of IWorld implementation

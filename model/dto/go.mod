@@ -1,4 +1,4 @@
-module simulator/dto
+module simulator/model/dto
 
 go 1.19
 
