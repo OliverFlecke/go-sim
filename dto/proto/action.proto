@@ -1,0 +1,32 @@
+syntax = "proto3";
+package simulator;
+
+option go_package = "simulator/dto";
+
+message ActionList {
+    repeated Action actions = 1;
+}
+
+message Action {
+    oneof action {
+        Move move = 1;
+        MoveWithBox move_with_box = 2;
+    }
+}
+
+enum Direction {
+    NONE = 0;
+    NORTH = 1;
+    EAST = 2;
+    SOUTH = 3;
+    WEST = 4;
+}
+
+message Move {
+    Direction direction = 1;
+}
+
+message MoveWithBox {
+    Direction direction = 1;
+    uint32 box_id = 2;
+}

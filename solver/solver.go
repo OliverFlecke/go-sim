@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	simulator "simulator/core"
 	"simulator/core/action"
@@ -85,6 +87,7 @@ func runSolverLoop(
 		*totalActions += len(actions)
 
 		sim.SetActions(a, actions)
+		sendActions(a, actions)
 		quit := make(chan bool)
 		events := sim.Run(quit)
 
@@ -100,6 +103,28 @@ func runSolverLoop(
 		}
 		goalId += 1
 	}
+}
+
+func sendActions(a *agent.Agent, acts []action.Action) {
+	httpposturl := "http://localhost:8080/agent/0"
+
+	var jsonData = []byte(`[{
+		"type": "Move",
+		"direction": "North"
+	}]`)
+	request, err := http.NewRequest("POST", httpposturl, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return
+	}
+	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+	client := &http.Client{}
+	res, err := client.Do(request)
+	if err != nil {
+		panic(err)
+	}
+
+	logger.Info(`Status: %d\n`, res.StatusCode)
 }
 
 func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration) {

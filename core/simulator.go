@@ -93,13 +93,13 @@ func (s *Simulation) internalRun() (bool, error) {
 			action := actions[0]
 			// fmt.Printf("Agent %c performing action %v. Remaining: %d\n", agent.GetRune(), action.ToString(), len(actions)-1)
 			result := action.Perform(agent, s.world)
+			s.actions[agent] = actions[1:]
 			if result.Err != nil {
 				logger.Error("Action failed. %v\nerr: %v\n", action.ToString(), result.Err.Error())
 				fmt.Println(s.world.ToStringWithObjects())
 				return true, result.Err
 			}
 
-			s.actions[agent] = actions[1:]
 			finished = finished && len(s.actions[agent]) == 0
 		}
 	}

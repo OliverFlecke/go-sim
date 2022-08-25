@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -17,8 +16,10 @@ import (
 	"simulator/core/logger"
 	"simulator/core/objects"
 	"simulator/core/utils"
+	"simulator/dto"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 var sim *simulator.Simulation
@@ -47,23 +48,23 @@ func main() {
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
 
-func genAction() {
-	// TEMP: generating random actions to keep sim running
-	a := sim.GetWorld().GetAgents()[0]
-	if len(sim.GetActions(a)) > 0 {
-		return
-	}
+// func genAction() {
+// 	// TEMP: generating random actions to keep sim running
+// 	a := sim.GetWorld().GetAgents()[0]
+// 	if len(sim.GetActions(a)) > 0 {
+// 		return
+// 	}
 
-	potential := utils.Filteri(
-		utils.Mapi(direction.All, func(_ int, dir direction.Direction) action.MoveAction {
-			return *action.NewMove(dir)
-		}),
-		func(_ int, act action.MoveAction) bool {
-			return act.IsValid(a, sim.GetWorld())
-		})
-	// logger.Verbose("Agent: %v, Actions: %v\n", a, potential)
-	sim.SetActions(a, []action.Action{potential[rand.Intn(len(potential))]})
-}
+// 	potential := utils.Filteri(
+// 		utils.Mapi(direction.All, func(_ int, dir direction.Direction) action.MoveAction {
+// 			return *action.NewMove(dir)
+// 		}),
+// 		func(_ int, act action.MoveAction) bool {
+// 			return act.IsValid(a, sim.GetWorld())
+// 		})
+// 	// logger.Verbose("Agent: %v, Actions: %v\n", a, potential)
+// 	sim.SetActions(a, []action.Action{potential[rand.Intn(len(potential))]})
+// }
 
 type ActionDto struct {
 	Type      string `json:"type" binding:"required"`
@@ -89,9 +90,49 @@ func directionFromString(dir string) (direction.Direction, error) {
 	}
 }
 
+func parseAction(c *gin.Context) {
+	bytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		logger.Error("Unable to parse body", err.Error())
+		return
+	}
+
+	logger.Info("got bytes from body: %v\n", string(bytes))
+	acts := &dto.ActionList{}
+	if err := protojson.Unmarshal(bytes, acts); err != nil {
+		logger.Error("Unable to parse text %v", err.Error())
+	}
+
+	logger.Info("Parsed: %v\n", acts)
+
+	act := dto.Action{
+		Action: &dto.Action_Move{
+			Move: &dto.Move{
+				Direction: dto.Direction_NORTH,
+			},
+		},
+	}
+	list := dto.ActionList{
+		Actions: []*dto.Action{
+			&act,
+		},
+	}
+
+	// data, err := proto.Marshal(&act)
+	// if err != nil {
+	// 	logger.Error(`Could not marshal: %v`, err)
+	// }
+
+	// logger.Info("proto data: %v\n", data)
+	marshalledBytes, _ := protojson.Marshal(&list)
+	logger.Info("proto json: %v\n", string(marshalledBytes))
+}
+
 func addActions(c *gin.Context) {
 	agentId := c.Param("agent")
 	logger.Verbose("adding action for %v\n", agentId)
+
+	parseAction(c)
 
 	data := new([]ActionDto)
 	err := c.BindJSON(data)
