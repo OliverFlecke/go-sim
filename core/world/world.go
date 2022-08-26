@@ -118,10 +118,6 @@ func (w *World) GetAgents() []*agent.Agent {
 func (w *World) MoveObject(o objects.WorldObject, newLoc location.Location) {
 	for i, v := range w.objectMap[o.GetLocation()] {
 		if v == o {
-			// switch o.(type) {
-			// case *objects.Box:
-			// 	logger.Verbose("Moving object: %v\n", o)
-			// }
 			w.objectMap[o.GetLocation()] = utils.Remove(w.objectMap[o.GetLocation()], i)
 		}
 	}

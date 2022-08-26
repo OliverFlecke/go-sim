@@ -125,13 +125,11 @@ func sendActions(a *agent.Agent, acts []action.Action) {
 	}
 	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	client := &http.Client{}
-	res, err := client.Do(request)
+	_, err = client.Do(request)
 	if err != nil {
 		logger.Error("%v\n", err.Error())
 		return
 	}
-
-	logger.Info("Status: %d\n", res.StatusCode)
 }
 
 func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration) {
