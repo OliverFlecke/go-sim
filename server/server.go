@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	simulator "simulator/core"
 	"simulator/core/action"
@@ -23,14 +24,16 @@ type App struct {
 	SimulationHandler *SimulationHandler
 }
 
-func (h *App) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *App) ServeHTTP(res http.ResponseWriter, r *http.Request) {
+	fmt.Printf("[APP] %s %s %s\n", time.Now().UTC().Format(time.RFC3339), r.Method, r.URL.Path)
+
 	var head string
-	head, req.URL.Path = ShiftPath(req.URL.Path)
+	head, r.URL.Path = ShiftPath(r.URL.Path)
 
 	switch head {
 	case "simulation":
 		res.Header().Set("Access-Control-Allow-Origin", "*")
-		h.SimulationHandler.ServeHttp(res, req)
+		h.SimulationHandler.ServeHTTP(res, r)
 	default:
 		http.Error(res, "Not Found", http.StatusNotFound)
 	}

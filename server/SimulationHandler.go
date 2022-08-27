@@ -9,21 +9,26 @@ import (
 
 	simulator "simulator/core"
 	"simulator/core/level"
+	"simulator/core/objects"
+	"simulator/model/dto"
+	"simulator/model/mapping"
+
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type SimulationHandler struct {
-	simulations map[string]*simulator.Simulation
+	simulations  map[string]*simulator.Simulation
+	agentHandler *AgentHandler
 }
 
 func NewSimulationHandler() *SimulationHandler {
 	return &SimulationHandler{
-		simulations: make(map[string]*simulator.Simulation),
+		simulations:  make(map[string]*simulator.Simulation),
+		agentHandler: NewAgentHandler(),
 	}
 }
 
-func (h *SimulationHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("[APP] %s %s %s\n", time.Now().UTC().Format(time.RFC3339), r.Method, r.URL.Path)
-
+func (h *SimulationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var head string
 	head, r.URL.Path = ShiftPath(r.URL.Path)
 
@@ -45,8 +50,8 @@ func (h *SimulationHandler) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	switch head {
 	case "stream":
 		h.streamEvents(sim).ServeHTTP(w, r)
-	case "agent": // TODO:
-
+	case "agent":
+		h.agentHandler.Handle(sim).ServeHTTP(w, r)
 	case "map":
 		h.sendRawLevelContent(sim).ServeHTTP(w, r)
 	}
@@ -90,18 +95,41 @@ func (h *SimulationHandler) streamEvents(sim *simulator.Simulation) http.Handler
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Connection", "keep-alive")
 
-		flusher, _ := w.(http.Flusher)
-
 		for e := range sim.GetEvents() {
 			switch e.Status {
 			case simulator.COMPLETED:
-				fmt.Fprint(w, "complete")
-				flusher.Flush()
+				SendSSE(w, "complete", nil)
 				return
 			case simulator.RUNNING:
-				fmt.Fprintf(w, "data: %s\n\n", e.CurrentTime)
-				flusher.Flush()
+				state := createWorldState(sim)
+				bs, err := protojson.Marshal(state)
+				if err != nil {
+					fmt.Println(err.Error())
+					http.Error(w, "could not serialize state", http.StatusInternalServerError)
+					return
+				}
+
+				SendSSE(w, "move", bs)
 			}
 		}
 	})
+}
+
+func createWorldState(sim *simulator.Simulation) *dto.WorldState {
+	state := &dto.WorldState{
+		Agents: make([]*dto.Agent, 0),
+	}
+
+	for _, x := range sim.GetWorld().GetAgents() {
+		state.Agents = append(state.Agents, mapping.AgentToDto(x))
+	}
+	for _, x := range sim.GetWorld().GetBoxes() {
+		state.Boxes = append(state.Boxes, mapping.BoxToDto(&x))
+	}
+	for _, x := range sim.GetWorld().GetObjects(objects.GOAL) {
+		g := x.(*objects.Goal)
+		state.Goals = append(state.Goals, mapping.GoalToDto(g))
+	}
+
+	return state
 }
