@@ -10,6 +10,7 @@ import (
 )
 
 type IWorld interface {
+	GetName() string
 	GetMap() Grid
 	GetLocation(location.Location) GridType
 	GetNeighbors(location.Location) []location.Location
@@ -32,13 +33,15 @@ type WorldObjectMap map[location.Location][]objects.WorldObject
 type Grid map[location.Location]GridType
 
 type World struct {
+	name      string
 	grid      Grid
 	objects   objects.ObjectMap
 	objectMap WorldObjectMap
 }
 
-func NewWorld(grid Grid, xs objects.ObjectMap) *World {
+func NewWorld(name string, grid Grid, xs objects.ObjectMap) *World {
 	return &World{
+		name:      name,
 		grid:      grid,
 		objects:   xs,
 		objectMap: objectsToMap(xs),
@@ -47,6 +50,7 @@ func NewWorld(grid Grid, xs objects.ObjectMap) *World {
 
 func NewGridWorld(size int) *World {
 	return &World{
+		name: "grid world",
 		grid: NewGrid(size),
 	}
 }
@@ -76,6 +80,10 @@ func (w *World) GetMap() Grid {
 }
 
 // IMPL: IWorld interface
+
+func (w *World) GetName() string {
+	return w.name
+}
 
 func (world *World) GetLocation(loc location.Location) GridType {
 	result, found := world.grid[loc]

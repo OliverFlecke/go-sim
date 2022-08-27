@@ -12,7 +12,7 @@ import (
 )
 
 func TestParseStringToMap(t *testing.T) {
-	wp, err := ParseWorldFromFile("../../maps/00.map")
+	wp, err := ParseWorldFromFile("../../maps", "00.map")
 	w := wp.(*world.World)
 	expected := world.NewGridWorld(2)
 
@@ -26,11 +26,11 @@ func TestParseStringToMap(t *testing.T) {
 }
 
 func TestPaseMapFile(t *testing.T) {
-	w, err := ParseWorldFromFile("../../maps/02.map")
+	w, err := ParseWorldFromFile("../../maps/", "02.map")
 
 	objs := make(objects.ObjectMap)
 	objs[objects.AGENT] = []objects.WorldObject{
-		agent.NewAgentWithStartLocation("unused", '0', location.New(1, 1)),
+		agent.NewAgentWithStartLocation('0', location.New(1, 1)),
 	}
 	objs[objects.BOX] = []objects.WorldObject{
 		objects.NewBox(location.New(2, 2), 'A'),
@@ -38,7 +38,7 @@ func TestPaseMapFile(t *testing.T) {
 	objs[objects.GOAL] = []objects.WorldObject{
 		objects.NewGoal(location.New(3, 3), 'a'),
 	}
-	expected := world.NewWorld(world.NewGrid(3), objs)
+	expected := world.NewWorld("", world.NewGrid(3), objs)
 
 	if err != nil {
 		t.Fatal(err)
@@ -51,7 +51,7 @@ func TestPaseMapFile(t *testing.T) {
 
 // Error tests
 func TestParseWorldFromFileNotFound(t *testing.T) {
-	_, err := ParseWorldFromFile("non_existing_file")
+	_, err := ParseWorldFromFile("", "non_existing_file")
 
 	assert.EqualError(t, err, "open non_existing_file: no such file or directory")
 }

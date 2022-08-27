@@ -19,25 +19,43 @@ import (
 
 var simulations map[string]*simulator.Simulation
 
+type App struct {
+	SimulationHandler *SimulationHandler
+}
+
+func (h *App) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	var head string
+	head, req.URL.Path = ShiftPath(req.URL.Path)
+
+	switch head {
+	case "simulation":
+		res.Header().Set("Access-Control-Allow-Origin", "*")
+		h.SimulationHandler.ServeHttp(res, req)
+	default:
+		http.Error(res, "Not Found", http.StatusNotFound)
+	}
+}
+
 func main() {
 	simulations = make(map[string]*simulator.Simulation)
 
-	r := gin.Default()
-	r.Use(func(ctx *gin.Context) {
-		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-	})
+	app := &App{
+		SimulationHandler: NewSimulationHandler(),
+	}
+	fmt.Printf("App listening on port 8080\n")
+	http.ListenAndServe(":8080", app)
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.GET("/simulation/:sim/stream", StreamHandler)
-	r.GET("/simulation/:sim/map", getMapOfWorld)
-	r.POST("/simulation/create", startSimulationHandler)
-	r.POST("/simulation/:sim/agent/:agent", addActions)
+	// r := gin.Default()
+	// r.Use(func(ctx *gin.Context) {
+	// 	ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	// })
 
-	r.Run() // listen and serve on 0.0.0.0:8080
+	// r.GET("/simulation/:sim/stream", StreamHandler)
+	// r.GET("/simulation/:sim/map", getMapOfWorld)
+	// r.POST("/simulation/create", startSimulationHandler)
+	// r.POST("/simulation/:sim/agent/:agent", addActions)
+
+	// r.Run() // listen and serve on 0.0.0.0:8080
 }
 
 func getSimulation(c *gin.Context) *simulator.Simulation {
@@ -129,8 +147,6 @@ func getMapOfWorld(c *gin.Context) {
 		return
 	}
 
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-
 	w := sim.GetWorld()
 	objs := make(map[string][]objects.WorldObject)
 	objs["agents"] = w.GetObjects(objects.AGENT)
@@ -144,7 +160,7 @@ func getMapOfWorld(c *gin.Context) {
 }
 
 func startSimulationHandler(c *gin.Context) {
-	id := startSimulation("04.map")
+	id := startSimulation("SAanagram.map")
 
 	c.JSON(http.StatusAccepted, id)
 }

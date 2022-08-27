@@ -53,7 +53,7 @@ func TestIsSolved(t *testing.T) {
 	objs[objects.GOAL] = append(objs[objects.GOAL], objects.NewGoal(location.New(1, 1), 'a'))
 	objs[objects.BOX] = append(objs[objects.BOX], objects.NewBox(location.New(1, 1), 'a'))
 
-	w := NewWorld(NewGrid(3), objs)
+	w := NewWorld("random", NewGrid(3), objs)
 
 	assert.True(t, w.IsSolved(), "All goals have a valid box at the same position, and should therefore be solved")
 }
@@ -67,7 +67,7 @@ func TestIsSolvedFailing(t *testing.T) {
 	objs[objects.GOAL] = append(objs[objects.GOAL], objects.NewGoal(location.New(1, 1), 'a'))
 	objs[objects.BOX] = append(objs[objects.BOX], objects.NewBox(location.New(2, 2), 'a'))
 
-	w := NewWorld(NewGrid(3), objs)
+	w := NewWorld("random", NewGrid(3), objs)
 
 	assert.False(t, w.IsSolved(), "Box is not at the same position as the goal, and problem is therefore not solved")
 }
@@ -76,7 +76,7 @@ func TestIsSolvedFailingNoBox(t *testing.T) {
 	objs := make(objects.ObjectMap)
 	objs[objects.GOAL] = append(objs[objects.GOAL], objects.NewGoal(location.New(1, 1), 'a'))
 
-	w := NewWorld(NewGrid(3), objs)
+	w := NewWorld("random", NewGrid(3), objs)
 
 	assert.False(t, w.IsSolved(), "No box to solve problem with")
 }

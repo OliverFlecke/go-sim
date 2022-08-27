@@ -38,7 +38,7 @@ func main() {
 		}
 	}
 
-	w, err := level.ParseWorldFromFile(mapName)
+	w, err := level.ParseWorldFromFile("maps", mapName)
 	if err != nil {
 		log.Fatal(err)
 	}

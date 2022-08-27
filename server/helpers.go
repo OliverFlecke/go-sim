@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const PATH_TO_LEVELS = "../maps"
+
 func getAgent(id uint32, sim *simulator.Simulation) *agent.Agent {
 	for _, a := range sim.GetWorld().GetAgents() {
 		if a.GetId() == id {
@@ -21,10 +23,8 @@ func getAgent(id uint32, sim *simulator.Simulation) *agent.Agent {
 }
 
 func startSimulation(levelName string) string {
-	id := strings.ReplaceAll(uuid.NewString(), `-`, ``)
-
-	levelWithPath := "../maps/" + levelName
-	w, _ := level.ParseWorldFromFile(levelWithPath)
+	id := generateId()
+	w, _ := level.ParseWorldFromFile(PATH_TO_LEVELS, levelName)
 
 	opt := simulator.SimulationOptions{}
 	opt.SetTickDuration(50 * time.Millisecond)
@@ -33,4 +33,8 @@ func startSimulation(levelName string) string {
 	simulations[id].Id = id
 
 	return id
+}
+
+func generateId() string {
+	return strings.ReplaceAll(uuid.NewString(), `-`, ``)
 }

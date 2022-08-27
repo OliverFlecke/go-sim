@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"simulator/core/location"
 	"simulator/core/utils"
 	"testing"
 )
@@ -30,8 +31,8 @@ import (
 // }
 
 func TestNewAgent(t *testing.T) {
-	a := NewAgent("Agent A", 'A')
-	b := NewAgent("Agent B", 'B')
+	a := NewAgent(0, 'A', location.New(0, 0))
+	b := NewAgent(1, 'B', location.New(0, 0))
 	utils.AssertEqual(t, a.Callsign, 'A')
 	utils.AssertEqual(t, b.Callsign, 'B')
 }

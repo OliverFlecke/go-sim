@@ -28,7 +28,7 @@ func main() {
 	}
 	mapName := os.Args[1]
 	var err error
-	w, err := level.ParseWorldFromFile(mapName)
+	w, err := level.ParseWorldFromFile("", mapName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func keyboardListener(w world.IWorld, a *agent.Agent) {
 					act = action.NewMove(dir)
 				}
 				sim.SetActions(a, []action.Action{act})
-				for range sim.Run(nil) {
+				for range sim.Run() {
 					fmt.Print(w.ToStringWithObjects())
 				}
 			}

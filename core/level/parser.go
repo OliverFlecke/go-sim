@@ -3,6 +3,7 @@ package level
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"simulator/core/agent"
 	"simulator/core/location"
@@ -97,7 +98,7 @@ func parseObjects(str string) (objects.ObjectMap, error) {
 	return result, nil
 }
 
-func parseWorldFromString(content string) (world.IWorld, error) {
+func parseWorldFromString(name, content string) (world.IWorld, error) {
 	splits := strings.Split(content, "\n\n")
 
 	grid := parseGridWorld(splits[0])
@@ -108,19 +109,19 @@ func parseWorldFromString(content string) (world.IWorld, error) {
 			return nil, err
 		}
 
-		w = world.NewWorld(grid, objs)
+		w = world.NewWorld(name, grid, objs)
 	} else {
-		w = world.NewWorld(grid, make(objects.ObjectMap))
+		w = world.NewWorld(name, grid, make(objects.ObjectMap))
 	}
 
 	return w, nil
 }
 
-func ParseWorldFromFile(filename string) (world.IWorld, error) {
-	content, err := os.ReadFile(filename)
+func ParseWorldFromFile(dir, filename string) (world.IWorld, error) {
+	content, err := os.ReadFile(filepath.Join(dir, filename))
 	if err != nil {
 		return nil, err
 	}
 
-	return parseWorldFromString(string(content))
+	return parseWorldFromString(filename, string(content))
 }
