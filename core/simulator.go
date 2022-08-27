@@ -72,11 +72,11 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 					fmt.Println("Stopping simulation")
 					return
 				case t := <-ticker.C:
-					finished, err := s.internalRun()
-					s.output <- SimulationEvent{CurrentTime: t, Err: err}
+					_, err := s.internalRun()
+					s.output <- SimulationEvent{CurrentTime: t, Err: err, Status: RUNNING}
 
-					if finished {
-						// return
+					if s.world.IsSolved() {
+						s.output <- SimulationEvent{CurrentTime: t, Err: err, Status: COMPLETED}
 					}
 				}
 			}

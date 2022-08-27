@@ -79,7 +79,7 @@ func addActions(c *gin.Context) {
 		return
 	}
 
-	logger.Verbose("adding action for %d\n", agentId)
+	// logger.Verbose("adding action for %d\n", agentId)
 	a := getAgent(uint32(agentId), sim)
 
 	acts, err := parseAction(c)
@@ -99,16 +99,21 @@ func StreamHandler(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	c.Stream(func(w io.Writer) bool {
-		if _, ok := <-sim.GetEvents(); ok {
+		if e, ok := <-sim.GetEvents(); ok {
 			w := sim.GetWorld()
-			c.SSEvent("move", gin.H{
-				"agents": w.GetAgents(),
-				"boxes":  w.GetObjects(objects.BOX),
-				"goals":  w.GetObjects(objects.GOAL),
-			})
 
-			// genAction()
-			return true
+			switch e.Status {
+			case simulator.RUNNING:
+				c.SSEvent("move", gin.H{
+					"agents": w.GetAgents(),
+					"boxes":  w.GetObjects(objects.BOX),
+					"goals":  w.GetObjects(objects.GOAL),
+				})
+				return true
+			case simulator.COMPLETED:
+				c.SSEvent("complete", nil)
+				return false
+			}
 		}
 
 		return false
