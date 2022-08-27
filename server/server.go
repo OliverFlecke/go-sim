@@ -1,17 +1,13 @@
-// package server
-
 package main
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
-	"time"
 
 	simulator "simulator/core"
 	"simulator/core/action"
-	"simulator/core/agent"
-	"simulator/core/level"
 	"simulator/core/logger"
 	"simulator/core/objects"
 	"simulator/model/dto"
@@ -21,48 +17,46 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-var sim *simulator.Simulation
+var simulations map[string]*simulator.Simulation
 
 func main() {
-	mapName := "../maps/04.map"
-	w, _ := level.ParseWorldFromFile(mapName)
-
-	opt := simulator.SimulationOptions{}
-	opt.SetTickDuration(20 * time.Millisecond)
-	sim = simulator.NewSimulation(w, opt)
+	simulations = make(map[string]*simulator.Simulation)
 
 	r := gin.Default()
+	r.Use(func(ctx *gin.Context) {
+		ctx.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	})
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
-	r.GET("/stream", StreamHandler)
-	r.GET("/simulation/map", getMapOfWorld)
-	r.POST("/agent/:agent", addActions)
-
-	// genAction()
-	go sim.Run(nil)
+	r.GET("/simulation/:sim/stream", StreamHandler)
+	r.GET("/simulation/:sim/map", getMapOfWorld)
+	r.POST("/simulation/create", startSimulationHandler)
+	r.POST("/simulation/:sim/agent/:agent", addActions)
 
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
 
-type ActionDto struct {
-	Type      string `json:"type" binding:"required"`
-	Direction string `json:"direction" binding:"required"`
+func getSimulation(c *gin.Context) *simulator.Simulation {
+	simId := c.Param("sim")
+	sim := simulations[simId]
+	if sim == nil {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("no simulation with id '%s' exists", simId))
+		return nil
+	}
+
+	return sim
 }
 
-type List struct {
-	Messages []ActionDto `binding:"required"`
-}
-
-func parseAction(c *gin.Context) ([]action.Action, error) {
-	bytes, err := io.ReadAll(c.Request.Body)
+func parseAction(sim *simulator.Simulation, body io.ReadCloser) ([]action.Action, error) {
+	bytes, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
 
-	// logger.Info("got bytes from body: %v\n", string(bytes))
 	acts := &dto.ActionList{}
 	if err := protojson.Unmarshal(bytes, acts); err != nil {
 		logger.Error("Unable to parse text %v", err.Error())
@@ -73,30 +67,39 @@ func parseAction(c *gin.Context) ([]action.Action, error) {
 }
 
 func addActions(c *gin.Context) {
-	agentId, err := strconv.ParseUint(c.Param("agent"), 10, 32)
-	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	sim := getSimulation(c)
+	if sim == nil {
 		return
 	}
 
-	// logger.Verbose("adding action for %d\n", agentId)
+	agentId, err := strconv.ParseUint(c.Param("agent"), 10, 32)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("id for agent could not be parsed: '%s'", c.Param("agent")))
+		return
+	}
+
 	a := getAgent(uint32(agentId), sim)
 
-	acts, err := parseAction(c)
+	acts, err := parseAction(sim, c.Request.Body)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	sim.SetActions(a, acts)
+	sim.Run(nil)
 	c.Status(http.StatusNoContent)
 }
 
 func StreamHandler(c *gin.Context) {
+	sim := getSimulation(c)
+	if sim == nil {
+		return
+	}
+
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	c.Stream(func(w io.Writer) bool {
 		if e, ok := <-sim.GetEvents(); ok {
@@ -121,6 +124,11 @@ func StreamHandler(c *gin.Context) {
 }
 
 func getMapOfWorld(c *gin.Context) {
+	sim := getSimulation(c)
+	if sim == nil {
+		return
+	}
+
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	w := sim.GetWorld()
@@ -129,18 +137,14 @@ func getMapOfWorld(c *gin.Context) {
 	objs["goals"] = w.GetObjects(objects.GOAL)
 	objs["boxes"] = w.GetObjects(objects.BOX)
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"state": objs,
 		"grid":  w.GetStaticMapAsString(),
 	})
 }
 
-func getAgent(id uint32, sim *simulator.Simulation) *agent.Agent {
-	for _, a := range sim.GetWorld().GetAgents() {
-		if a.GetId() == id {
-			return a
-		}
-	}
+func startSimulationHandler(c *gin.Context) {
+	id := startSimulation("04.map")
 
-	return nil
+	c.JSON(http.StatusAccepted, id)
 }

@@ -37,6 +37,7 @@ func main() {
 			return
 		}
 	}
+
 	w, err := level.ParseWorldFromFile(mapName)
 	if err != nil {
 		log.Fatal(err)
@@ -49,6 +50,7 @@ func main() {
 	opt := simulator.SimulationOptions{}
 	opt.SetTickDuration(speed)
 	sim := simulator.NewSimulation(w, opt)
+	sim.Id = os.Args[3]
 
 	goalId := 0
 	totalActions := 0
@@ -90,7 +92,7 @@ func runSolverLoop(
 		*totalActions += len(actions)
 
 		sim.SetActions(a, actions)
-		sendActions(a, actions)
+		sendActions(sim, a, actions)
 		quit := make(chan bool)
 		events := sim.Run(quit)
 
@@ -108,8 +110,12 @@ func runSolverLoop(
 	}
 }
 
-func sendActions(a *agent.Agent, acts []action.Action) {
-	httpposturl := "http://localhost:8080/agent/0"
+func sendActions(
+	sim *simulator.Simulation,
+	a *agent.Agent,
+	acts []action.Action) {
+	httpposturl := fmt.Sprintf("http://localhost:8080/simulation/%s/agent/%d",
+		sim.Id, a.GetId())
 
 	dtos := mapping.ToDtos(acts)
 	data, err := protojson.Marshal(dtos)
@@ -199,27 +205,28 @@ func findBox(
 	w world.IWorld,
 	start location.Location,
 	goal *objects.Goal) (*objects.Box, error) {
-	obj, err := pathfinding.FindLocation(w, start, func(l location.Location) objects.WorldObject {
-		var box *objects.Box = nil
-		var otherGoal *objects.Goal
+	obj, err := pathfinding.FindLocation(w, start,
+		func(l location.Location) objects.WorldObject {
+			var box *objects.Box = nil
+			var otherGoal *objects.Goal
 
-		for _, obj := range w.GetObjectsAtLocation(l) {
-			switch v := obj.(type) {
-			case *objects.Box:
-				if v.Matches(*goal) {
-					box = v
+			for _, obj := range w.GetObjectsAtLocation(l) {
+				switch v := obj.(type) {
+				case *objects.Box:
+					if v.Matches(*goal) {
+						box = v
+					}
+				case *objects.Goal:
+					otherGoal = v
 				}
-			case *objects.Goal:
-				otherGoal = v
 			}
-		}
 
-		if box == nil || (otherGoal != nil && box.Matches(*otherGoal)) {
-			return nil
-		}
+			if box == nil || (otherGoal != nil && box.Matches(*otherGoal)) {
+				return nil
+			}
 
-		return box
-	})
+			return box
+		})
 
 	if err != nil {
 		return nil, err

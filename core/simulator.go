@@ -10,11 +10,13 @@ import (
 )
 
 type Simulation struct {
+	Id      string
 	world   world.IWorld
 	options SimulationOptions
 	actions map[*agent.Agent][]action.Action
 	ticks   uint64
 	output  chan SimulationEvent
+	state   SimulationStatus
 }
 
 func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
@@ -49,13 +51,21 @@ func (s *Simulation) GetActions(a *agent.Agent) []action.Action {
 }
 
 func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
+	if s.state == RUNNING {
+		return s.output
+	}
+
+	s.state = RUNNING
+
 	if s.options.tickDuration == 0 {
 		go func() {
 			defer close(s.output)
 			for {
-				finished, err := s.internalRun()
-				s.output <- SimulationEvent{CurrentTime: time.Now(), Err: err}
-				if finished {
+				noMoreActions, err := s.internalRun()
+				s.updateOutput(time.Now(), err)
+
+				if s.state != COMPLETED && noMoreActions {
+					s.state = PAUSED
 					return
 				}
 			}
@@ -73,11 +83,7 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 					return
 				case t := <-ticker.C:
 					_, err := s.internalRun()
-					s.output <- SimulationEvent{CurrentTime: t, Err: err, Status: RUNNING}
-
-					if s.world.IsSolved() {
-						s.output <- SimulationEvent{CurrentTime: t, Err: err, Status: COMPLETED}
-					}
+					s.updateOutput(t, err)
 				}
 			}
 		}()
@@ -85,9 +91,18 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 	return s.output
 }
 
+func (s *Simulation) updateOutput(t time.Time, err error) {
+	s.output <- SimulationEvent{CurrentTime: t, Err: err, Status: RUNNING}
+
+	if s.world.IsSolved() {
+		s.state = COMPLETED
+		s.output <- SimulationEvent{CurrentTime: t, Err: err, Status: COMPLETED}
+	}
+}
+
 func (s *Simulation) internalRun() (bool, error) {
 	s.ticks++
-	finished := true
+	noMoreActions := true
 	for agent, actions := range s.actions {
 		if len(actions) > 0 {
 			action := actions[0]
@@ -100,9 +115,9 @@ func (s *Simulation) internalRun() (bool, error) {
 				return true, result.Err
 			}
 
-			finished = finished && len(s.actions[agent]) == 0
+			noMoreActions = noMoreActions && len(s.actions[agent]) == 0
 		}
 	}
 
-	return finished, nil
+	return noMoreActions, nil
 }
