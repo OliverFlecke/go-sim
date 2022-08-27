@@ -1,0 +1,32 @@
+syntax = "proto3";
+package simulator;
+
+option go_package = "simulator/model/dto";
+
+message Location {
+    uint32 x = 1;
+    uint32 y = 2;
+}
+
+message Agent {
+    uint32 id = 1;
+    Location location = 2;
+    uint32 callsign = 3;
+}
+
+message Box {
+    uint32 id = 1;
+    Location location = 2;
+    uint32 type = 3;
+}
+
+message Goal {
+    Location location = 2;
+    uint32 type = 3;
+}
+
+message WorldState {
+    repeated Agent agents = 1;
+    repeated Box boxes = 2;
+    repeated Goal goals = 3;
+}
