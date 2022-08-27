@@ -59,11 +59,16 @@ func parseLocation(re *regexp.Regexp, match []string) (location.Location, error)
 func parseObjects(str string) (objects.ObjectMap, error) {
 	result := make(objects.ObjectMap)
 
+	counts := make(map[objects.WorldObjectKey]uint32)
+	counts[objects.AGENT] = 0
+	counts[objects.BOX] = 0
+	counts[objects.GOAL] = 0
+
 	re := regexp.MustCompile(`(?P<type>[a-z]+) (?P<id>\w) (?P<x>\d+),(?P<y>\d+)`)
 	typeIdx := re.SubexpIndex("type")
 	for i, line := range strings.Split(str, "\n") {
 		for _, match := range re.FindAllStringSubmatch(line, -1) {
-			id := rune(match[re.SubexpIndex("id")][0])
+			r := rune(match[re.SubexpIndex("id")][0])
 			loc, err := parseLocation(re, match)
 			if err != nil {
 				return nil, fmt.Errorf("unable to parse location on line %d with %s", i, line)
@@ -71,13 +76,17 @@ func parseObjects(str string) (objects.ObjectMap, error) {
 
 			switch match[typeIdx] {
 			case "agent":
-				agent := agent.NewAgentWithStartLocation(string(id), id, loc)
+				id := counts[objects.AGENT]
+				counts[objects.AGENT] += 1
+				agent := agent.NewAgent(id, r, loc)
 				result[objects.AGENT] = append(result[objects.AGENT], agent)
 			case "box":
-				box := objects.NewBox(loc, id)
+				id := counts[objects.BOX]
+				counts[objects.BOX] += 1
+				box := objects.NewBoxWithId(id, loc, r)
 				result[objects.BOX] = append(result[objects.BOX], box)
 			case "goal":
-				goal := objects.NewGoal(loc, id)
+				goal := objects.NewGoal(loc, r)
 				result[objects.GOAL] = append(result[objects.GOAL], goal)
 			default:
 				return nil, fmt.Errorf("unable to handle type: '%s'", match[typeIdx])

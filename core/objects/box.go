@@ -31,10 +31,14 @@ var boxCount uint32 = 0
 func NewBox(location location.Location, boxType rune) *Box {
 	id := boxCount
 	boxCount += 1
+	return NewBoxWithId(id, location, boxType)
+}
+
+func NewBoxWithId(id uint32, l location.Location, t rune) *Box {
 	return &Box{
 		id:       id,
-		Location: location,
-		Type:     boxType,
+		Location: l,
+		Type:     t,
 	}
 }
 

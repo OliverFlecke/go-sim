@@ -8,24 +8,20 @@ type Agent struct {
 	id       uint32
 	Location location.Location `json:"location"`
 	Callsign rune              `json:"callsign"`
-	name     string
 }
 
 var agentCount uint32 = 0
 
-// Simple constructor
-func NewAgent(name string, callsign rune) *Agent {
-	return NewAgentWithStartLocation(name, callsign, location.New(0, 0))
-}
-
-func NewAgentWithStartLocation(name string, callsign rune, start location.Location) *Agent {
+func NewAgentWithStartLocation(callsign rune, start location.Location) *Agent {
 	id := agentCount
 	agentCount += 1
 
+	return NewAgent(id, callsign, start)
+}
+func NewAgent(id uint32, callsign rune, start location.Location) *Agent {
 	return &Agent{
 		id:       id,
 		Callsign: callsign,
-		name:     name,
 		Location: start,
 	}
 }
