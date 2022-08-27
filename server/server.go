@@ -5,10 +5,12 @@ package main
 import (
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	simulator "simulator/core"
 	"simulator/core/action"
+	"simulator/core/agent"
 	"simulator/core/level"
 	"simulator/core/logger"
 	"simulator/core/objects"
@@ -71,9 +73,14 @@ func parseAction(c *gin.Context) ([]action.Action, error) {
 }
 
 func addActions(c *gin.Context) {
-	agentId := c.Param("agent")
-	logger.Verbose("adding action for %v\n", agentId)
-	a := sim.GetWorld().GetAgents()[0]
+	agentId, err := strconv.ParseUint(c.Param("agent"), 10, 32)
+	if err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	logger.Verbose("adding action for %d\n", agentId)
+	a := getAgent(uint32(agentId), sim)
 
 	acts, err := parseAction(c)
 	if err != nil {
@@ -121,4 +128,14 @@ func getMapOfWorld(c *gin.Context) {
 		"state": objs,
 		"grid":  w.GetStaticMapAsString(),
 	})
+}
+
+func getAgent(id uint32, sim *simulator.Simulation) *agent.Agent {
+	for _, a := range sim.GetWorld().GetAgents() {
+		if a.GetId() == id {
+			return a
+		}
+	}
+
+	return nil
 }
