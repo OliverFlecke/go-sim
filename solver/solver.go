@@ -93,14 +93,12 @@ func runSolverLoop(
 
 		sim.SetActions(a, actions)
 		sendActions(sim, a, actions)
-		quit := make(chan bool)
-		events := sim.Run(quit)
+		events := sim.Run()
 
 		for e := range events {
 			if e.Err != nil {
 				return
 			}
-			// logger.Verbose("%s\n", w.ToStringWithObjects())
 
 			if len(sim.GetActions(a)) == 0 {
 				break

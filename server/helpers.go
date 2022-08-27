@@ -4,6 +4,7 @@ import (
 	simulator "simulator/core"
 	"simulator/core/agent"
 	"simulator/core/level"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -20,7 +21,7 @@ func getAgent(id uint32, sim *simulator.Simulation) *agent.Agent {
 }
 
 func startSimulation(levelName string) string {
-	id := uuid.New().String()
+	id := strings.ReplaceAll(uuid.NewString(), `-`, ``)
 
 	levelWithPath := "../maps/" + levelName
 	w, _ := level.ParseWorldFromFile(levelWithPath)

@@ -87,7 +87,7 @@ func addActions(c *gin.Context) {
 	}
 
 	sim.SetActions(a, acts)
-	sim.Run(nil)
+	sim.Run()
 	c.Status(http.StatusNoContent)
 }
 

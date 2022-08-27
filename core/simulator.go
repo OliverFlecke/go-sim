@@ -16,6 +16,7 @@ type Simulation struct {
 	actions map[*agent.Agent][]action.Action
 	ticks   uint64
 	output  chan SimulationEvent
+	pause   chan bool
 	state   SimulationStatus
 }
 
@@ -25,6 +26,8 @@ func NewSimulation(world world.IWorld, options SimulationOptions) *Simulation {
 		options: options,
 		actions: make(map[*agent.Agent][]action.Action),
 		output:  make(chan SimulationEvent),
+		pause:   make(chan bool),
+		state:   NONE,
 	}
 }
 
@@ -50,7 +53,12 @@ func (s *Simulation) GetActions(a *agent.Agent) []action.Action {
 	return s.actions[a]
 }
 
-func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
+func (s *Simulation) Pause() {
+	s.state = PAUSED
+	s.pause <- true
+}
+
+func (s *Simulation) Run() <-chan SimulationEvent {
 	if s.state == RUNNING {
 		return s.output
 	}
@@ -78,7 +86,7 @@ func (s *Simulation) Run(quit chan bool) <-chan SimulationEvent {
 
 			for {
 				select {
-				case <-quit:
+				case <-s.pause:
 					fmt.Println("Stopping simulation")
 					return
 				case t := <-ticker.C:
