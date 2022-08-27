@@ -2,9 +2,16 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	simulator "simulator/core"
+	"simulator/core/action"
+	"simulator/core/logger"
+	"simulator/model/dto"
+	"simulator/model/mapping"
 	"strconv"
+
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type AgentHandler struct{}
@@ -35,4 +42,19 @@ func (h *AgentHandler) Handle(sim *simulator.Simulation) http.Handler {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+}
+
+func parseAction(sim *simulator.Simulation, body io.ReadCloser) ([]action.Action, error) {
+	bytes, err := io.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+
+	acts := &dto.ActionList{}
+	if err := protojson.Unmarshal(bytes, acts); err != nil {
+		logger.Error("Unable to parse text %v", err.Error())
+		return nil, err
+	}
+
+	return mapping.GetActions(acts, sim), nil
 }

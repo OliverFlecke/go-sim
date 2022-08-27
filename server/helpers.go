@@ -3,9 +3,7 @@ package main
 import (
 	simulator "simulator/core"
 	"simulator/core/agent"
-	"simulator/core/level"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -20,19 +18,6 @@ func getAgent(id uint32, sim *simulator.Simulation) *agent.Agent {
 	}
 
 	return nil
-}
-
-func startSimulation(levelName string) string {
-	id := generateId()
-	w, _ := level.ParseWorldFromFile(PATH_TO_LEVELS, levelName)
-
-	opt := simulator.SimulationOptions{}
-	opt.SetTickDuration(50 * time.Millisecond)
-
-	simulations[id] = simulator.NewSimulation(w, opt)
-	simulations[id].Id = id
-
-	return id
 }
 
 func generateId() string {
