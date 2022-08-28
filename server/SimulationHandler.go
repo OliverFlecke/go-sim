@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -33,10 +35,7 @@ func (h *SimulationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	head, r.URL.Path = ShiftPath(r.URL.Path)
 
 	if head == "create" && r.Method == http.MethodPost {
-		// TODO: Should return error if map cannot be found
-		// TODO: Should read map from request body
-		id, _ := h.startSimulation("04.map")
-		w.Write([]byte(id))
+		h.handleCreate(w, r)
 		return
 	}
 
@@ -55,6 +54,28 @@ func (h *SimulationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "map":
 		h.sendRawLevelContent(sim).ServeHTTP(w, r)
 	}
+}
+
+func (h *SimulationHandler) handleCreate(w http.ResponseWriter, r *http.Request) {
+	// TODO: Should return error if map cannot be found
+
+	bs, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Unable to read body", http.StatusBadRequest)
+		return
+	}
+	opt := &dto.CreateSimulationOptions{}
+	protojson.Unmarshal(bs, opt)
+
+	// TODO: level name should be checked for whether the extension is there
+	id, err := h.startSimulation(opt.Level)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, fmt.Sprintf("Level '%s' does not exists", opt.Level), http.StatusBadRequest)
+		return
+	}
+
+	w.Write([]byte(id))
 }
 
 func (h *SimulationHandler) startSimulation(levelName string) (string, error) {

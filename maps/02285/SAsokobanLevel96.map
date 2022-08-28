@@ -1,0 +1,36 @@
+ ##### ######
+ #   ###    #
+ ##     #  # #
+ #           ##
+ # #  ## #    #
+ #  ##   # ## #
+ ##           #
+ #    # #    #
+ #   #   #  ##
+ #####      #
+     ####  ##
+        ####
+
+box s 4,2
+box s 6,2
+box s 9,2
+box s 12,2
+box s 4,3
+agent 0 6,3
+box s 8,3
+box s 11,3
+goal s 11,4
+goal s 12,4
+goal s 13,4
+box s 7,5
+goal s 13,5
+box s 5,6
+goal s 12,6
+goal s 13,6
+box s 3,7
+box s 4,7
+box s 7,7
+goal s 9,7
+goal s 12,7
+box s 10,8
+box s 7,9

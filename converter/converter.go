@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"unicode"
 )
 
 func main() {
@@ -36,7 +37,7 @@ func main() {
 			obj.WriteString(fmt.Sprintf("goal %c %d,%d\n", c, x, y))
 			str.WriteRune(' ')
 		case 'A' <= c && c <= 'Z':
-			obj.WriteString(fmt.Sprintf("box %c %d,%d\n", c, x, y))
+			obj.WriteString(fmt.Sprintf("box %c %d,%d\n", unicode.ToLower(c), x, y))
 			str.WriteRune(' ')
 		case '0' <= c && c <= '9':
 			obj.WriteString(fmt.Sprintf("agent %c %d,%d\n", c, x, y))

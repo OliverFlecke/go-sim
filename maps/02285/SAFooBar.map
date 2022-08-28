@@ -1,0 +1,29 @@
+##############
+## # # # # # #
+#            #
+## # # # # ###
+##############
+
+goal a 2,1
+goal c 4,1
+goal e 6,1
+goal g 8,1
+goal i 10,1
+goal k 12,1
+agent 0 1,2
+box k 2,2
+box j 3,2
+box i 4,2
+box h 5,2
+box g 6,2
+box f 7,2
+box e 8,2
+box d 9,2
+box c 10,2
+box b 11,2
+box a 12,2
+goal b 2,3
+goal d 4,3
+goal f 6,3
+goal h 8,3
+goal j 10,3
