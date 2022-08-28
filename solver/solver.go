@@ -1,66 +1,34 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"log"
-	"net/http"
-	"os"
 	simulator "simulator/core"
 	"simulator/core/action"
 	"simulator/core/agent"
 	"simulator/core/direction"
-	"simulator/core/level"
 	"simulator/core/location"
 	"simulator/core/logger"
 	"simulator/core/objects"
 	"simulator/core/utils"
 	"simulator/core/world"
-	"simulator/model/mapping"
 	"simulator/pathfinding"
 	"time"
-
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const defaultSpeed time.Duration = 250 * time.Millisecond
 
 func main() {
+	sim := parseArgs()
+
 	fmt.Println("Starting simulation...")
-	mapName := os.Args[1]
-	var speed = defaultSpeed
-	var err error
-	if len(os.Args) > 2 {
-		speed, err = time.ParseDuration(os.Args[2])
-		if err != nil {
-			fmt.Printf("Time must be an integer. Error: %s", err)
-			return
-		}
-	}
-
-	w, err := level.ParseWorldFromFile("maps", mapName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	a := w.GetObjects(objects.AGENT)[0].(*agent.Agent)
-	fmt.Print(w.ToStringWithObjects())
-	fmt.Println()
-
-	opt := simulator.SimulationOptions{}
-	opt.SetTickDuration(speed)
-	sim := simulator.NewSimulation(w, opt)
-	sim.Id = os.Args[3]
-
 	goalId := 0
 	totalActions := 0
 	var computationTime time.Duration = 0
+	a := sim.GetWorld().GetObjects(objects.AGENT)[0].(*agent.Agent)
 
-	// fmt.Printf("\n\nWorld at %s\n", t)
-	// fmt.Print(w.ToStringWithObjects())
-	runSolverLoop(w, goalId, a, &computationTime, &totalActions, sim)
+	runSolverLoop(goalId, a, &computationTime, &totalActions, sim)
 
-	if w.IsSolved() {
+	if sim.GetWorld().IsSolved() {
 		logger.Info("Problem solved.\n")
 	} else {
 		logger.Error("Problem incorrectly solved\n")
@@ -71,12 +39,13 @@ func main() {
 }
 
 func runSolverLoop(
-	w world.IWorld,
 	goalId int,
 	a *agent.Agent,
 	computationTime *time.Duration,
 	totalActions *int,
 	sim *simulator.Simulation) {
+	w := sim.GetWorld()
+
 	for {
 		goal := getGoal(w, goalId)
 		if goal == nil {
@@ -105,34 +74,6 @@ func runSolverLoop(
 			}
 		}
 		goalId += 1
-	}
-}
-
-func sendActions(
-	sim *simulator.Simulation,
-	a *agent.Agent,
-	acts []action.Action) {
-	httpposturl := fmt.Sprintf("http://localhost:8080/simulation/%s/agent/%d",
-		sim.Id, a.GetId())
-
-	dtos := mapping.ToDtos(acts)
-	data, err := protojson.Marshal(dtos)
-	if err != nil {
-		logger.Error("%v\n", err.Error())
-		return
-	}
-
-	request, err := http.NewRequest("POST", httpposturl, bytes.NewBuffer(data))
-	if err != nil {
-		logger.Error("%v\n", err.Error())
-		return
-	}
-	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
-	client := &http.Client{}
-	_, err = client.Do(request)
-	if err != nil {
-		logger.Error("%v\n", err.Error())
-		return
 	}
 }
 

@@ -65,7 +65,7 @@ func (s *Simulation) Run() <-chan SimulationEvent {
 
 	s.state = RUNNING
 
-	if s.options.tickDuration == 0 {
+	if s.options.TickDuration == 0 {
 		go func() {
 			defer close(s.output)
 			for {
@@ -79,7 +79,7 @@ func (s *Simulation) Run() <-chan SimulationEvent {
 			}
 		}()
 	} else {
-		ticker := time.NewTicker(s.options.tickDuration)
+		ticker := time.NewTicker(s.options.TickDuration)
 
 		go func() {
 			defer ticker.Stop()

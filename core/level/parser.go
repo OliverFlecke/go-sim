@@ -98,7 +98,7 @@ func parseObjects(str string) (objects.ObjectMap, error) {
 	return result, nil
 }
 
-func parseWorldFromString(name, content string) (world.IWorld, error) {
+func ParseWorldFromString(name, content string) (world.IWorld, error) {
 	splits := strings.Split(content, "\n\n")
 
 	grid := parseGridWorld(splits[0])
@@ -123,5 +123,5 @@ func ParseWorldFromFile(dir, filename string) (world.IWorld, error) {
 		return nil, err
 	}
 
-	return parseWorldFromString(filename, string(content))
+	return ParseWorldFromString(filename, string(content))
 }
