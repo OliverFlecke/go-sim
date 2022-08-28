@@ -20,7 +20,7 @@ import (
 const URL = "http://localhost:8080"
 
 func downloadLevel(id string) world.IWorld {
-	url := fmt.Sprintf("%s/simulation/%s/map", URL, id)
+	url := fmt.Sprintf("%s/simulation/%s/level", URL, id)
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("Could not download map %s", err)

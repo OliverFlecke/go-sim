@@ -51,7 +51,7 @@ func (h *SimulationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.streamEvents(sim).ServeHTTP(w, r)
 	case "agent":
 		h.agentHandler.Handle(sim).ServeHTTP(w, r)
-	case "map":
+	case "level":
 		h.sendRawLevelContent(sim).ServeHTTP(w, r)
 	}
 }
