@@ -15,12 +15,18 @@ func (h *LevelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var head string
 	head, r.URL.Path = ShiftPath(r.URL.Path)
 
-	if head == "" {
-		h.GetMaps().ServeHTTP(w, r)
-		return
-	}
+	switch r.Method {
+	case http.MethodGet:
+		switch head {
+		case "":
+			h.GetMaps().ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
 
-	http.NotFound(w, r)
+	default:
+		http.NotFound(w, r)
+	}
 }
 
 func (h *LevelHandler) GetMaps() http.Handler {

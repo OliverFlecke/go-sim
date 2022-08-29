@@ -35,6 +35,6 @@ func (h *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "level":
 		h.MapHandler.ServeHTTP(w, r)
 	default:
-		http.Error(w, "Not Found", http.StatusNotFound)
+		http.NotFound(w, r)
 	}
 }

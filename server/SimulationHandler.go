@@ -34,25 +34,30 @@ func (h *SimulationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var head string
 	head, r.URL.Path = ShiftPath(r.URL.Path)
 
-	if head == "create" && r.Method == http.MethodPost {
+	switch {
+	case head == "create" && r.Method == http.MethodPost:
 		h.handleCreate(w, r)
-		return
-	}
+	case head != "":
+		sim := h.simulations[head]
+		if sim == nil {
+			http.Error(w, fmt.Sprintf("invalid simulation id %q", head), http.StatusBadRequest)
+			return
+		}
 
-	sim := h.simulations[head]
-	if sim == nil {
-		http.Error(w, fmt.Sprintf("invalid simulation id %q", head), http.StatusBadRequest)
-		return
-	}
+		head, r.URL.Path = ShiftPath(r.URL.Path)
+		switch {
+		case head == "agent":
+			h.agentHandler.Handle(sim).ServeHTTP(w, r)
+		case head == "stream" && r.Method == http.MethodGet:
+			h.streamEvents(sim).ServeHTTP(w, r)
+		case head == "level" && r.Method == http.MethodGet:
+			h.sendRawLevelContent(sim).ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
 
-	head, r.URL.Path = ShiftPath(r.URL.Path)
-	switch head {
-	case "stream":
-		h.streamEvents(sim).ServeHTTP(w, r)
-	case "agent":
-		h.agentHandler.Handle(sim).ServeHTTP(w, r)
-	case "level":
-		h.sendRawLevelContent(sim).ServeHTTP(w, r)
+	default:
+		http.NotFound(w, r)
 	}
 }
 
