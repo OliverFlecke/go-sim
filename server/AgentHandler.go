@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	simulator "simulator/core"
 	"simulator/core/action"
@@ -32,12 +33,18 @@ func (h *AgentHandler) Handle(sim *simulator.Simulation) http.Handler {
 
 		a := getAgent(uint32(id), sim)
 
-		switch r.Method {
-		case http.MethodPost:
-			acts, _ := parseAction(sim, r.Body)
-			sim.SetActions(a, acts)
-			sim.Run()
-			w.WriteHeader(http.StatusNoContent)
+		head, r.URL.Path = ShiftPath(r.URL.Path)
+
+		switch {
+		case head == "" && r.Method == http.MethodPost:
+			acts, err := parseAction(sim, r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+			} else {
+				sim.SetActions(a, acts)
+				sim.Run()
+				w.WriteHeader(http.StatusNoContent)
+			}
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
@@ -47,13 +54,14 @@ func (h *AgentHandler) Handle(sim *simulator.Simulation) http.Handler {
 func parseAction(sim *simulator.Simulation, body io.ReadCloser) ([]action.Action, error) {
 	bytes, err := io.ReadAll(body)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, fmt.Errorf("request body could not be read")
 	}
 
 	acts := &dto.ActionList{}
 	if err := protojson.Unmarshal(bytes, acts); err != nil {
 		logger.Error("Unable to parse text %v", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("request body could not be read")
 	}
 
 	return mapping.GetActions(acts, sim), nil

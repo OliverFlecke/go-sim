@@ -1,79 +1,95 @@
 openapi: 3.1.0
 info:
-    version: 1.0.0
-    title: Simulation API
-    description: An API exposing a simulation engine for a Sokoban-like game
+  version: 1.0.0
+  title: Simulation API
+  description: An API exposing a simulation engine for a Sokoban-like game
 paths:
-    /level:
-        get:
-            description: Returns a list of all available levels
-            responses:
-                200:
-                    description: Successfully returns list of levels
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
-                                example: -
-                                    sample01.map
-                                    sample02.map
-                500:
-                    description: Error if the levels could not be returned
-    /simulation/create:
-        post:
-            description: Start a new simulation
-            requestBody:
-              required: true
-              content:
-                application/json:
-                    schema:
-                        type: object
-                        required:
-                            - level
-                        properties:
-                            level:
-                                type: string
-            responses:
-                200:
-                    description: Returns an unique id of the started simulation
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
-                                example: 47dd9bfd898b456898965c5ed2fce41f
-                400:
-                    description: An error that the request could not be understood
-                    content:
-                        text/plain:
-                            schema:
-                                type: string
-                                examples:
-                                    level_not_found: Level abc.map does not exists
-                                    body_error: Unable to read body
-    /simulation/{id}/level:
-        description: Get the level data for a given simulation
-        parameters:
-            - $ref: '#/components/parameters/SimulationId'
-        responses:
-            200:
-                description: Successfully returns the level data
-                content:
-                    text/plain:
-                        schema:
-                            type: string
-    /simulation/{id}/stream:
-        description: Get a stream of events happening in the simulation
-        parameters:
-            - $ref: '#/components/parameters/SimulationId'
-        responses:
-            200:
-                description: Successfull stream of events. Will close on simulation completion
-components:
-    parameters:
-        SimulationId:
-            name: simId
-            in: path
-            description: Id of the simulation
-            required: true
-            schema:
+  /level:
+    get:
+      description: Returns a list of all available levels
+      responses:
+        200:
+          description: Successfully returns list of levels
+          content:
+            text/plain:
+              schema:
                 type: string
+                example: |
+                  sample01.map
+                  sample02.map
+        500:
+          description: Internal server error
+  /simulation/create:
+    post:
+      description: Start a new simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - level
+              properties:
+                level:
+                  type: string
+                  example: level01.map
+      responses:
+        200:
+          description: Returns an unique id of the started simulation
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 47dd9bfd898b456898965c5ed2fce41f
+        400:
+          description: An error that the request could not be understood
+          content:
+            text/plain:
+              schema:
+                type: string
+                examples:
+                  level_not_found: Level abc.map does not exists
+                  body_error: Unable to read body
+  /simulation/{simId}/level:
+    get:
+      description: Get the level data for a given simulation
+      parameters:
+        - $ref: "#/components/parameters/SimulationId"
+      responses:
+        200:
+          description: Successfully returns the level data
+          content:
+            text/plain:
+              schema:
+                type: string
+  /simulation/{simId}/stream:
+    get:
+      description: Get a stream of events happening in the simulation
+      parameters:
+        - $ref: "#/components/parameters/SimulationId"
+      responses:
+        200:
+          description: Successfull stream of events. Will close on simulation completion
+  /simulation/{simId}/agent/{agentId}:
+    post:
+      description: Append a list of actions to the given agent
+      responses:
+        204:
+          description: Successfully appended the given actions
+        400:
+          description: Bad request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Request body could not be read
+components:
+  parameters:
+    SimulationId:
+      name: simId
+      in: path
+      description: Id of the simulation
+      required: true
+      schema:
+        type: string
