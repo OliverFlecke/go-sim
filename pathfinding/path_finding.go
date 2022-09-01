@@ -25,7 +25,7 @@ type SearchStats struct {
 Find a location that satisfies the given predicate.
 Uses BFS to find the nearest location.
 */
-func FindLocation(
+func FindClosestObject(
 	world world.IWorld,
 	start location.Location,
 	predicate func(location.Location) objects.WorldObject) (objects.WorldObject, error) {
@@ -77,7 +77,7 @@ func FindPath(
 
 	for {
 		if queue.Empty() {
-			fmt.Printf("States visited %v\n", visited)
+			// fmt.Printf("States visited %v\n", visited)
 			err = fmt.Errorf("no path found between from %v to %v", start, goal)
 			break
 		}

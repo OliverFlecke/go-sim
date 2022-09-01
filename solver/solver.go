@@ -47,7 +47,7 @@ func runSolverLoop(
 	w := sim.GetWorld()
 
 	for {
-		goal := getGoal(w, goalId)
+		goal := getGoal(w, a.GetLocation())
 		if goal == nil {
 			break
 		}
@@ -80,7 +80,7 @@ func runSolverLoop(
 func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration) {
 	// fmt.Printf("\nSolving goal %v\n", goal)
 	startTime := time.Now()
-	box, err := findBox(w, a.GetLocation(), goal)
+	box, err := findNearestBox(w, goal)
 	if err != nil {
 		fmt.Println(err)
 		return nil, 0
@@ -131,20 +131,27 @@ func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Act
 	return actions, time.Since(startTime)
 }
 
-func getGoal(w world.IWorld, i int) *objects.Goal {
-	goals := w.GetUnsolvedGoals()
-	if len(goals) > 0 {
-		return &goals[0]
+func getGoal(w world.IWorld, start location.Location) *objects.Goal {
+	if len(w.GetUnsolvedGoals()) == 0 {
+		return nil
 	}
 
-	return nil
+	result, _ := pathfinding.FindClosestObject(w, start,
+		func(l location.Location) objects.WorldObject {
+			for _, x := range w.GetObjectsAtLocation(l) {
+				switch o := x.(type) {
+				case *objects.Goal:
+					return o
+				}
+			}
+			return nil
+		})
+
+	return result.(*objects.Goal)
 }
 
-func findBox(
-	w world.IWorld,
-	start location.Location,
-	goal *objects.Goal) (*objects.Box, error) {
-	obj, err := pathfinding.FindLocation(w, start,
+func findNearestBox(w world.IWorld, goal *objects.Goal) (*objects.Box, error) {
+	obj, err := pathfinding.FindClosestObject(w, goal.GetLocation(),
 		func(l location.Location) objects.WorldObject {
 			var box *objects.Box = nil
 			var otherGoal *objects.Goal
