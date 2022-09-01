@@ -13,7 +13,7 @@ func parseArgs() *simulator.Simulation {
 	switch len(os.Args) {
 	case 2:
 		return parseServerArgs()
-	case 4:
+	case 3, 4:
 		return parseLocal()
 	default:
 		log.Fatalf("Invalid number of args %d", len(os.Args))
@@ -56,7 +56,9 @@ func parseLocal() *simulator.Simulation {
 	opt := simulator.SimulationOptions{}
 	opt.SetTickDuration(speed)
 	sim := simulator.NewSimulation(w, opt)
-	sim.Id = os.Args[3]
+	if len(os.Args) > 3 {
+		sim.Id = os.Args[3]
+	}
 
 	return sim
 }

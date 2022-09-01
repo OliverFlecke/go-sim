@@ -11,10 +11,10 @@ import (
 	prque "github.com/ethereum/go-ethereum/common/prque"
 )
 
-type Cell struct {
+type SearchCell struct {
 	location location.Location
 	depth    int64
-	previous *Cell
+	previous *SearchCell
 }
 
 type SearchStats struct {
@@ -33,11 +33,11 @@ func FindClosestObject(
 	visited := mapset.NewSet[location.Location]()
 	visited.Add(start)
 	queue := prque.New(nil)
-	queue.Push(Cell{location: start}, 0)
+	queue.Push(SearchCell{location: start}, 0)
 
 	for !queue.Empty() {
 		current, _ := queue.Pop()
-		cell := current.(Cell)
+		cell := current.(SearchCell)
 
 		obj := predicate(cell.location)
 		if obj != nil {
@@ -47,11 +47,12 @@ func FindClosestObject(
 		for _, neighbor := range world.GetNeighbors(cell.location) {
 			if !visited.Contains(neighbor) {
 				visited.Add(neighbor)
-				queue.Push(Cell{
-					location: neighbor,
-					depth:    cell.depth + 1,
-					previous: &cell,
-				},
+				queue.Push(
+					SearchCell{
+						location: neighbor,
+						depth:    cell.depth + 1,
+						previous: &cell,
+					},
 					-(cell.depth + 1))
 			}
 		}
@@ -70,7 +71,7 @@ func FindPath(
 	visited := mapset.NewSet[location.Location]()
 	visited.Add(start)
 	queue := prque.New(nil)
-	queue.Push(Cell{location: start}, 0)
+	queue.Push(SearchCell{location: start}, 0)
 
 	var result []location.Location
 	var err error
@@ -83,7 +84,7 @@ func FindPath(
 		}
 
 		current, _ := queue.Pop()
-		cell := current.(Cell)
+		cell := current.(SearchCell)
 
 		if cell.location == goal {
 			result = cell.getLocations()
@@ -102,7 +103,7 @@ func FindPath(
 		for _, neighbor := range neighbors {
 			if !visited.Contains(neighbor) {
 				visited.Add(neighbor)
-				queue.Push(Cell{
+				queue.Push(SearchCell{
 					location: neighbor,
 					depth:    cell.depth + 1,
 					previous: &cell,
@@ -119,7 +120,7 @@ func FindPath(
 		}, err
 }
 
-func (item *Cell) getLocations() []location.Location {
+func (item *SearchCell) getLocations() []location.Location {
 	result := make([]location.Location, 0)
 
 	for item != nil {
