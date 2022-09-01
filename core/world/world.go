@@ -21,6 +21,7 @@ type IWorld interface {
 	MoveObject(o objects.WorldObject, newLoc location.Location)
 
 	GetUnsolvedGoals() []objects.Goal
+	IsGoalSolved(g *objects.Goal) bool
 	GetBoxes() []objects.Box
 	IsSolved() bool
 
@@ -141,7 +142,7 @@ func (w *World) GetObjectsAtLocation(loc location.Location) []objects.WorldObjec
 func (w *World) IsSolved() bool {
 	solved := true
 	for _, x := range w.objects[objects.GOAL] {
-		solved = solved && w.isGoalSolved(x.(*objects.Goal))
+		solved = solved && w.IsGoalSolved(x.(*objects.Goal))
 	}
 
 	return solved
@@ -151,7 +152,7 @@ func (w *World) GetUnsolvedGoals() []objects.Goal {
 
 	for _, x := range w.objects[objects.GOAL] {
 		g := x.(*objects.Goal)
-		if !w.isGoalSolved(g) {
+		if !w.IsGoalSolved(g) {
 			goals = append(goals, *g)
 		}
 	}
@@ -172,7 +173,7 @@ func (w *World) GetBoxes() []objects.Box {
 
 // End of IWorld implementation
 
-func (w *World) isGoalSolved(g *objects.Goal) bool {
+func (w *World) IsGoalSolved(g *objects.Goal) bool {
 	for _, o := range w.GetObjectsAtLocation(g.GetLocation()) {
 		switch box := o.(type) {
 		case *objects.Box:
