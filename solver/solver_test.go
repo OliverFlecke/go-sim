@@ -32,9 +32,13 @@ func TestAllLevels(t *testing.T) {
 		opt.SetTickDuration(10 * time.Microsecond)
 		sim := simulator.NewSimulation(w, opt)
 
-		totalActions, duration := solveSimulation(sim)
-		// t.Logf("Number of actions: %d", totalActions)
-		// t.Logf("Duration:          %s", duration)
+		settings := SolverSettings{
+			SendActionsToServer: false,
+		}
+
+		// Run solver
+		totalActions, duration := solveSimulation(sim, settings)
+
 		stats := fmt.Sprintf("Actions: %5d, duration: %15s", totalActions, duration)
 		if sim.GetWorld().IsSolved() {
 			logger.Info("Solved           \t%-30s %s\n", name, stats)

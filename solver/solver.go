@@ -22,7 +22,10 @@ func main() {
 
 	fmt.Println("Starting simulation...")
 
-	totalActions, computationTime := solveSimulation(sim)
+	settings := SolverSettings{
+		SendActionsToServer: true,
+	}
+	totalActions, computationTime := solveSimulation(sim, settings)
 
 	if sim.GetWorld().IsSolved() {
 		logger.Info("Problem solved.\n")
@@ -34,12 +37,18 @@ func main() {
 	logger.Verbose("Simulation time:             %d\n", sim.GetTicks())
 }
 
-func solveSimulation(sim *simulator.Simulation) (uint32, time.Duration) {
+type SolverSettings struct {
+	SendActionsToServer bool
+}
+
+func solveSimulation(
+	sim *simulator.Simulation,
+	settings SolverSettings) (uint32, time.Duration) {
 	totalActions := 0
 	var computationTime time.Duration = 0
 	a := sim.GetWorld().GetObjects(objects.AGENT)[0].(*agent.Agent)
 
-	runSolverLoop(a, &computationTime, &totalActions, sim)
+	runSolverLoop(a, &computationTime, &totalActions, sim, settings)
 
 	return uint32(totalActions), computationTime
 }
@@ -48,7 +57,8 @@ func runSolverLoop(
 	a *agent.Agent,
 	computationTime *time.Duration,
 	totalActions *int,
-	sim *simulator.Simulation) {
+	sim *simulator.Simulation,
+	settings SolverSettings) {
 	w := sim.GetWorld()
 
 	for {
@@ -66,7 +76,10 @@ func runSolverLoop(
 		*totalActions += len(actions)
 
 		sim.SetActions(a, actions)
-		// sendActions(sim, a, actions)
+
+		if settings.SendActionsToServer {
+			sendActions(sim, a, actions)
+		}
 		events := sim.Run()
 
 		for e := range events {
