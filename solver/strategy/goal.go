@@ -1,4 +1,4 @@
-package main
+package strategy
 
 import (
 	"simulator/core/location"
@@ -9,7 +9,7 @@ import (
 
 // This strategy simply finds the goal closest to the given start
 // location using BFS
-func closestGoal(
+func ClosestGoal(
 	w world.IWorld,
 	start location.Location) *objects.Goal {
 	result, _ := pathfinding.FindClosestObject(w, start,
@@ -28,13 +28,15 @@ func closestGoal(
 	return result.(*objects.Goal)
 }
 
-func goalByDependencies(
+func GoalByDependencies(
 	w world.IWorld,
 	start location.Location) *objects.Goal {
 
 	tree := pathfinding.GoalDependencies(w, start)
-	for _, g := range pathfinding.GoalTreeToList(&tree) {
-		return g
+	// pathfinding.PrintTree(&tree, 0)
+
+	for _, g := range pathfinding.SearchNodeToList(&tree) {
+		return g.(*objects.Goal)
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"simulation/solver/strategy"
 	simulator "simulator/core"
 	"simulator/core/action"
 	"simulator/core/agent"
@@ -106,7 +107,7 @@ func runSolverLoop(
 func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Action, time.Duration, error) {
 	// fmt.Printf("\nSolving goal %v\n", goal)
 	startTime := time.Now()
-	box, err := findNearestBox(w, goal)
+	box, err := strategy.FindNearestBox(w, goal)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -158,37 +159,6 @@ func getGoal(w world.IWorld, start location.Location) *objects.Goal {
 		return nil
 	}
 
-	return goalByDependencies(w, start)
+	return strategy.GoalByDependencies(w, start)
 	// return closestGoal(w, start)
-}
-
-func findNearestBox(w world.IWorld, goal *objects.Goal) (*objects.Box, error) {
-	obj, err := pathfinding.FindClosestObject(w, goal.GetLocation(),
-		func(l location.Location) objects.WorldObject {
-			var box *objects.Box = nil
-			var otherGoal *objects.Goal
-
-			for _, obj := range w.GetObjectsAtLocation(l) {
-				switch v := obj.(type) {
-				case *objects.Box:
-					if v.Matches(*goal) {
-						box = v
-					}
-				case *objects.Goal:
-					otherGoal = v
-				}
-			}
-
-			if box == nil || (otherGoal != nil && box.Matches(*otherGoal)) {
-				return nil
-			}
-
-			return box
-		})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return obj.(*objects.Box), nil
 }

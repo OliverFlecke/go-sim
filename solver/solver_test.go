@@ -37,7 +37,7 @@ func TestAllLevels(t *testing.T) {
 		}
 
 		// Run solver
-		totalActions, duration := solveSimulation(sim, settings)
+		totalActions, duration, _ := solveSimulation(sim, settings)
 
 		stats := fmt.Sprintf("Actions: %5d, duration: %15s", totalActions, duration)
 		if sim.GetWorld().IsSolved() {
