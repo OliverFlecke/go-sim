@@ -29,7 +29,7 @@ func main() {
 	totalActions, computationTime, err := solveSimulation(sim, settings)
 
 	if err != nil {
-		fmt.Printf("Failure %s", err.Error())
+		fmt.Printf("Failure %s\n", err.Error())
 	}
 
 	if sim.GetWorld().IsSolved() {
