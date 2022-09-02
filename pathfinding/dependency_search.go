@@ -21,7 +21,7 @@ type SearchNode struct {
 	Item     objects.WorldObject
 }
 
-func newSearchNode(item objects.WorldObject) *SearchNode {
+func NewSearchNode(item objects.WorldObject) *SearchNode {
 	return &SearchNode{
 		Children: make([]*SearchNode, 0),
 		Item:     item,

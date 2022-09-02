@@ -32,7 +32,36 @@ func GoalByDependencies(
 	w world.IWorld,
 	start location.Location) *objects.Goal {
 
-	tree := pathfinding.GoalDependencies(w, start)
+	getGoalAtLocation := func(w world.IWorld, l location.Location) *objects.Goal {
+		for _, o := range w.GetObjectsAtLocation(l) {
+			switch g := o.(type) {
+			case *objects.Goal:
+				if !w.IsGoalSolved(g) {
+					return g
+				}
+			}
+		}
+
+		return nil
+	}
+
+	mapper := func(
+		w world.IWorld,
+		l location.Location,
+		node *pathfinding.SearchNode) *pathfinding.SearchNode {
+
+		goal := getGoalAtLocation(w, l)
+
+		if goal != nil && !w.IsGoalSolved(goal) {
+			newNode := pathfinding.NewSearchNode(goal)
+			node.Children = append(node.Children, newNode)
+			return newNode
+		} else {
+			return node
+		}
+	}
+
+	tree := pathfinding.FindDepencyTree(w, start, mapper)
 	// pathfinding.PrintTree(&tree, 0)
 
 	for _, g := range pathfinding.SearchNodeToList(&tree) {
