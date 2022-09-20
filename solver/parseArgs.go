@@ -45,7 +45,7 @@ func parseLocal() *simulator.Simulation {
 		}
 	}
 
-	w, err := level.ParseWorldFromFile("maps", mapName)
+	w, err := level.ParseWorldFromFile("level", mapName)
 	if err != nil {
 		log.Fatal(err)
 	}

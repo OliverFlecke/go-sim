@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const PATH_TO_LEVELS = "../maps"
+const PATH_TO_LEVELS = "../level"
 
 func getAgent(id uint32, sim *simulator.Simulation) *agent.Agent {
 	for _, a := range sim.GetWorld().GetAgents() {

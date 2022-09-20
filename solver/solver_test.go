@@ -15,7 +15,7 @@ import (
 
 func TestAllLevels(t *testing.T) {
 	log.Printf("Attempting to solve all levels")
-	const level_directory = "../maps"
+	const level_directory = "../level"
 
 	level.GetMaps(level_directory, func(levelName string) {
 		if strings.Contains(levelName, "unsolveable") {

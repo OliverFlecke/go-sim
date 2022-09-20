@@ -13,7 +13,7 @@ The repository contains the following packages:
   - The [simulation-ui](https://github.com/OliverFlecke/simulation-ui) contains a simple UI to render a graphical representation of the simulation.
 - `pathfinding` for general pathfinding algorithms
 - `solver` is an attempt to solve the existing problems that has been created
-- `maps` directory contains sample levels
+- `level` directory contains sample levels
 - `converter` for converting levels from an older map type
 
 ## Build Protobufs

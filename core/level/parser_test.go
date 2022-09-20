@@ -12,7 +12,7 @@ import (
 )
 
 func TestParseStringToMap(t *testing.T) {
-	wp, err := ParseWorldFromFile("../../maps", "00.map")
+	wp, err := ParseWorldFromFile("../../level", "00.map")
 	w := wp.(*world.World)
 	expected := world.NewGridWorld(2)
 
@@ -21,12 +21,12 @@ func TestParseStringToMap(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(w.GetMap(), expected.GetMap()) {
-		t.Fatalf("Parsed world does not match. Maps: Expected:\n%v\nActual:\n%v", expected.GetMap(), w.GetMap())
+		t.Fatalf("Parsed world does not match. Level: Expected:\n%v\nActual:\n%v", expected.GetMap(), w.GetMap())
 	}
 }
 
 func TestPaseMapFile(t *testing.T) {
-	w, err := ParseWorldFromFile("../../maps/", "02.map")
+	w, err := ParseWorldFromFile("../../level/", "02.map")
 
 	objs := make(objects.ObjectMap)
 	objs[objects.AGENT] = []objects.WorldObject{

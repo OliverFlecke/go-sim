@@ -3,5 +3,5 @@
 for var in "$@"
 do
     out=$(basename -s .lvl $var)
-    ./con $var > "maps/$out.map"
+    ./con $var > "level/$out.map"
 done
