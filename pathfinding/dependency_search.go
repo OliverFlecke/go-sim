@@ -29,7 +29,7 @@ func NewSearchNode(item objects.WorldObject) *SearchNode {
 }
 
 // TODO: Naming
-type dependency_mapper func(world.IWorld, location.Location, *SearchNode) *SearchNode
+type dependency_mapper func(world.IWorld, location.Location, *SearchNode) (*SearchNode, bool)
 
 func FindDepencyTree(
 	w world.IWorld,
@@ -46,7 +46,10 @@ func FindDepencyTree(
 		current, _ := queue.Pop()
 		cell := current.(searchCell)
 
-		node := mapper(w, cell.location, cell.node)
+		node, finished := mapper(w, cell.location, cell.node)
+		if finished {
+			break
+		}
 
 		for _, neighbor := range w.GetNeighbors(cell.location) {
 			if !visited.Contains(neighbor) {

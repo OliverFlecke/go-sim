@@ -34,16 +34,16 @@ func GoalByDependencies(
 	mapper := func(
 		w world.IWorld,
 		l location.Location,
-		node *pathfinding.SearchNode) *pathfinding.SearchNode {
+		node *pathfinding.SearchNode) (*pathfinding.SearchNode, bool) {
 
 		goal := getObjectAtLocationOfType[*objects.Goal](w, l)
 
 		if goal != nil && !w.IsGoalSolved(*goal) {
 			newNode := pathfinding.NewSearchNode(*goal)
 			node.Children = append(node.Children, newNode)
-			return newNode
+			return newNode, false
 		} else {
-			return node
+			return node, false
 		}
 	}
 

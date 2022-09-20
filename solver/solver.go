@@ -6,11 +6,9 @@ import (
 	simulator "simulator/core"
 	"simulator/core/action"
 	"simulator/core/agent"
-	"simulator/core/direction"
 	"simulator/core/location"
 	"simulator/core/logger"
 	"simulator/core/objects"
-	"simulator/core/utils"
 	"simulator/core/world"
 	"simulator/pathfinding"
 	"time"
@@ -115,7 +113,7 @@ func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Act
 		return nil, 0, fmt.Errorf("no box found")
 	}
 
-	p, _, err := pathfinding.FindPath(
+	locs, _, err := pathfinding.FindPath(
 		w,
 		a.GetLocation(),
 		box.GetLocation(),
@@ -125,31 +123,13 @@ func solveGoal(goal *objects.Goal, w world.IWorld, a *agent.Agent) ([]action.Act
 		return nil, 0, err
 	}
 
-	actions := utils.Mapi(location.PathToDirections(p), func(_ int, dir direction.Direction) action.Action {
-		return action.NewMove(dir)
-	})
-	p, _, err = pathfinding.FindPath(
-		w,
-		box.GetLocation(),
-		goal.GetLocation(),
-		pathfinding.AStar,
-		func(l location.Location, w world.IWorld) bool {
-			for _, o := range w.GetObjectsAtLocation(l) {
-				switch o.(type) {
-				case *objects.Box:
-					return false
-				}
-			}
-
-			return true
-		})
+	actions := LocationsToActions(locs)
+	locs, _, err = FindPathWhileCarringBox(w, box, goal.GetLocation())
 	if err != nil {
 		return nil, 0, fmt.Errorf("unable to find path from box to goal. error: %s", err.Error())
 	}
-	actions = append(actions, utils.Mapi(location.PathToDirections(p),
-		func(_ int, dir direction.Direction) action.Action {
-			return action.NewMoveWithBox(dir, box)
-		})...)
+
+	actions = append(actions, LocationsToMoveWithMoxActions(locs, box)...)
 
 	return actions, time.Since(startTime), nil
 }
