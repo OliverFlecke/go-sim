@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	simulator "simulator/core"
 	"simulator/core/level"
 	"simulator/core/logger"
@@ -24,42 +25,53 @@ func TestAllSALevels(t *testing.T) {
 }
 
 func TestAllMALevels(t *testing.T) {
-	log.Printf("Attempting to solve all SA levels")
+	log.Printf("Attempting to solve all MA levels")
 
 	testLevels(t, LEVEL_DIRECTORY, func(s string) bool {
 		return strings.Contains(s, "MA")
 	})
 }
 
+func TestMASolving(t *testing.T) {
+	lvl := filepath.Join(LEVEL_DIRECTORY, "MA01.map")
+	sim, stats, _ := executeSimulation(t, lvl)
+
+	assert.True(t, sim.GetWorld().IsSolved(), "world is not solved")
+	assert.Equal(t, 2, stats.TotalSteps)
+}
+
 func testLevels(t *testing.T, level_directory string, filter func(string) bool) {
-	level.GetMaps(level_directory, func(levelName string) {
-		if !filter(levelName) {
+	level.GetMaps(level_directory, func(lvlNameWithPath string) {
+		if !filter(lvlNameWithPath) {
 			return
 		}
 
-		name := strings.TrimPrefix(levelName, level_directory+"/")
-		// t.Logf("Solving level: %s")
+		name := strings.TrimPrefix(lvlNameWithPath, level_directory+"/")
 
-		w, err := level.ParseWorldFromFile("", levelName)
-		assert.NoError(t, err)
+		sim, stats, _ := executeSimulation(t, lvlNameWithPath)
 
-		opt := simulator.SimulationOptions{}
-		opt.SetTickDuration(10 * time.Microsecond)
-		sim := simulator.NewSimulation(w, opt)
-
-		settings := SolverSettings{
-			SendActionsToServer: false,
-		}
-
-		// Run solver
-		totalActions, duration, _ := solveSimulation(sim, settings)
-
-		stats := fmt.Sprintf("Actions: %5d, duration: %15s", totalActions, duration)
+		statsStr := fmt.Sprintf("Actions: %5d, duration: %15s", stats.TotalActions, stats.ComputationDuration)
 		if sim.GetWorld().IsSolved() {
-			logger.Info("Solved           \t%-30s %s\n", name, stats)
+			logger.Info("Solved           \t%-30s %s\n", name, statsStr)
 		} else {
-			logger.Error("Failed to solve: \t%-30s %s\n", name, stats)
+			logger.Error("Failed to solve: \t%-30s %s\n", name, statsStr)
 			t.Fail()
 		}
 	})
+}
+
+func executeSimulation(t *testing.T, levelName string) (*simulator.Simulation, SimulationStatistics, error) {
+	w, err := level.ParseWorldFromFile("", levelName)
+	assert.NoError(t, err)
+
+	opt := simulator.SimulationOptions{}
+	opt.SetTickDuration(10 * time.Microsecond)
+	sim := simulator.NewSimulation(w, opt)
+
+	settings := SolverSettings{
+		SendActionsToServer: false,
+	}
+
+	stats, err := solveSimulation(sim, settings)
+	return sim, stats, err
 }

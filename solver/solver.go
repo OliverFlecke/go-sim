@@ -26,7 +26,7 @@ func main() {
 		SendActionsToServer: false,
 		ShowSimulation:      true,
 	}
-	totalActions, computationTime, err := solveSimulation(sim, settings)
+	stats, err := solveSimulation(sim, settings)
 
 	if err != nil {
 		fmt.Printf("Failure %s\n", err.Error())
@@ -37,8 +37,8 @@ func main() {
 	} else {
 		logger.Error("Problem incorrectly solved\n")
 	}
-	logger.Verbose("Total actions:               %d\n", totalActions)
-	logger.Verbose("Total computation time:      %v\n", computationTime)
+	logger.Verbose("Total actions:               %d\n", stats.TotalActions)
+	logger.Verbose("Total computation time:      %v\n", stats.ComputationDuration)
 	logger.Verbose("Simulation time:             %d\n", sim.GetTicks())
 }
 
@@ -47,22 +47,32 @@ type SolverSettings struct {
 	ShowSimulation      bool
 }
 
+type SimulationStatistics struct {
+	TotalActions        uint64
+	TotalSteps          uint64
+	ComputationDuration time.Duration
+}
+
 func solveSimulation(
 	sim *simulator.Simulation,
-	settings SolverSettings) (uint32, time.Duration, error) {
-	totalActions := 0
+	settings SolverSettings) (SimulationStatistics, error) {
+	var totalActions uint64 = 0
 	var computationTime time.Duration = 0
 	a := sim.GetWorld().GetObjects(objects.AGENT)[0].(*agent.Agent)
 
 	err := runSolverLoop(a, &computationTime, &totalActions, sim, settings)
 
-	return uint32(totalActions), computationTime, err
+	return SimulationStatistics{
+			TotalActions:        totalActions,
+			TotalSteps:          sim.GetTicks(),
+			ComputationDuration: computationTime},
+		err
 }
 
 func runSolverLoop(
 	a *agent.Agent,
 	computationTime *time.Duration,
-	totalActions *int,
+	totalActions *uint64,
 	sim *simulator.Simulation,
 	settings SolverSettings) error {
 	w := sim.GetWorld()
@@ -82,7 +92,7 @@ func runSolverLoop(
 			break
 		}
 		*computationTime += t
-		*totalActions += len(actions)
+		*totalActions += uint64(len(actions))
 
 		sim.SetActions(a, actions)
 
@@ -97,7 +107,7 @@ func runSolverLoop(
 			}
 
 			if settings.ShowSimulation {
-				log.Printf(w.ToStringWithObjects())
+				log.Print(w.ToStringWithObjects())
 			}
 
 			if len(sim.GetActions(a)) == 0 {
