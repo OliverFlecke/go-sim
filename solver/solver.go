@@ -49,7 +49,7 @@ type SolverSettings struct {
 
 type SimulationStatistics struct {
 	TotalActions        uint64
-	TotalSteps          uint64
+	TotalTicks          uint64
 	ComputationDuration time.Duration
 }
 
@@ -64,7 +64,7 @@ func solveSimulation(
 
 	return SimulationStatistics{
 			TotalActions:        totalActions,
-			TotalSteps:          sim.GetTicks(),
+			TotalTicks:          sim.GetTicks(),
 			ComputationDuration: computationTime},
 		err
 }

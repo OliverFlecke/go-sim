@@ -32,12 +32,22 @@ func TestAllMALevels(t *testing.T) {
 	})
 }
 
+func TestSASolving(t *testing.T) {
+	lvl := filepath.Join(LEVEL_DIRECTORY, "02.map")
+	sim, stats, _ := executeSimulation(t, lvl)
+
+	assert.True(t, sim.GetWorld().IsSolved(), "world is not solved")
+	assert.Equal(t, uint64(4), stats.TotalActions, "it should take 2 actions to get to the box, and another two to get the box to its goal")
+	assert.Equal(t, uint64(4), stats.TotalTicks, "it should take 4 actions and therefore 4 ticks to solve the problem")
+}
+
 func TestMASolving(t *testing.T) {
 	lvl := filepath.Join(LEVEL_DIRECTORY, "MA01.map")
 	sim, stats, _ := executeSimulation(t, lvl)
 
 	assert.True(t, sim.GetWorld().IsSolved(), "world is not solved")
-	assert.Equal(t, 2, stats.TotalSteps)
+	assert.Equal(t, uint64(2), stats.TotalTicks, "total number of ticks should only be two, as both problems can be solved in parallel in two steps")
+	assert.Equal(t, uint64(4), stats.TotalActions, "total number of actions required is 2 + 2 = 4")
 }
 
 func testLevels(t *testing.T, level_directory string, filter func(string) bool) {
