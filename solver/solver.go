@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"simulation/solver/strategy"
 	simulator "simulator/core"
 	"simulator/core/action"
@@ -22,7 +23,8 @@ func main() {
 	fmt.Println("Starting simulation...")
 
 	settings := SolverSettings{
-		SendActionsToServer: true,
+		SendActionsToServer: false,
+		ShowSimulation:      true,
 	}
 	totalActions, computationTime, err := solveSimulation(sim, settings)
 
@@ -42,6 +44,7 @@ func main() {
 
 type SolverSettings struct {
 	SendActionsToServer bool
+	ShowSimulation      bool
 }
 
 func solveSimulation(
@@ -91,6 +94,10 @@ func runSolverLoop(
 		for e := range events {
 			if e.Err != nil {
 				return e.Err
+			}
+
+			if settings.ShowSimulation {
+				log.Printf(w.ToStringWithObjects())
 			}
 
 			if len(sim.GetActions(a)) == 0 {

@@ -13,12 +13,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAllLevels(t *testing.T) {
-	log.Printf("Attempting to solve all levels")
-	const level_directory = "../level"
+const LEVEL_DIRECTORY = "../level"
 
+func TestAllSALevels(t *testing.T) {
+	log.Printf("Attempting to solve all SA levels")
+
+	testLevels(t, LEVEL_DIRECTORY, func(s string) bool {
+		return !strings.Contains(s, "unsolvable") && !strings.Contains(s, "MA")
+	})
+}
+
+func TestAllMALevels(t *testing.T) {
+	log.Printf("Attempting to solve all SA levels")
+
+	testLevels(t, LEVEL_DIRECTORY, func(s string) bool {
+		return strings.Contains(s, "MA")
+	})
+}
+
+func testLevels(t *testing.T, level_directory string, filter func(string) bool) {
 	level.GetMaps(level_directory, func(levelName string) {
-		if strings.Contains(levelName, "unsolveable") {
+		if !filter(levelName) {
 			return
 		}
 
